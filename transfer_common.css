@@ -1,0 +1,381 @@
+/* 传输动画 */
+.transfer-animation {
+    background: linear-gradient(to bottom, #f0f7ff, #edf8ff);
+    border-radius: 20px;
+    height: 200px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 122, 255, 0.15);
+    border: 1px solid rgba(0, 122, 255, 0.1);
+}
+
+.transfer-animation-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+}
+
+.device-icon {
+    width: 60px;
+    height: 60px;
+    background-color: white;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    position: relative;
+}
+
+.device-icon i {
+    font-size: 24px;
+    color: #007AFF;
+}
+
+.device-label {
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-size: 13px;
+    font-weight: 500;
+    color: #007AFF;
+}
+
+.transfer-path {
+    position: absolute;
+    top: 50%;
+    left: 100px;
+    right: 100px;
+    height: 3px;
+    background-color: rgba(0, 122, 255, 0.2);
+    border-radius: 1.5px;
+    transform: translateY(-50%);
+}
+
+.transfer-packet {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: #007AFF;
+    border-radius: 50%;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 5;
+    box-shadow: 0 0 10px rgba(0, 122, 255, 0.5);
+    animation: movePacket 3s infinite;
+}
+
+@keyframes movePacket {
+    0%, 100% {
+        left: 100px;
+        opacity: 0;
+    }
+    10%, 90% {
+        opacity: 1;
+    }
+    50% {
+        left: calc(100% - 100px);
+    }
+}
+
+.transfer-packet:nth-child(2) {
+    animation-delay: 0.6s;
+    background-color: #34C759;
+    box-shadow: 0 0 10px rgba(52, 199, 89, 0.5);
+}
+
+.transfer-packet:nth-child(3) {
+    animation-delay: 1.2s;
+    background-color: #5856D6;
+    box-shadow: 0 0 10px rgba(88, 86, 214, 0.5);
+}
+
+.secure-badge {
+    position: absolute;
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: white;
+    border-radius: 15px;
+    padding: 6px 12px;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: #007AFF;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+}
+
+.secure-badge i {
+    margin-right: 6px;
+    font-size: 14px;
+}
+
+/* 设备信息卡片 */
+.device-card {
+    background-color: white;
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: center;
+}
+
+.device-info-icon {
+    width: 50px;
+    height: 50px;
+    background-color: rgba(0, 122, 255, 0.1);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 16px;
+    flex-shrink: 0;
+}
+
+.device-info-icon i {
+    font-size: 22px;
+    color: #007AFF;
+}
+
+.device-info-details {
+    flex: 1;
+}
+
+.device-info-name {
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.device-info-status {
+    font-size: 14px;
+    color: #34C759;
+    display: flex;
+    align-items: center;
+}
+
+.device-info-status i {
+    font-size: 12px;
+    margin-right: 4px;
+}
+
+/* 传输进度卡片 */
+.transfer-card {
+    background-color: white;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.transfer-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.transfer-card-title {
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.transfer-card-status {
+    background-color: rgba(52, 199, 89, 0.15);
+    color: #34C759;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 10px;
+}
+
+.transfer-card-status.pending {
+    background-color: rgba(255, 204, 0, 0.15);
+    color: #FF9500;
+}
+
+/* 文件项 */
+.file-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.file-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.file-icon {
+    width: 44px;
+    height: 44px;
+    background-color: #F2F2F7;
+    border-radius: 10px;
+    margin-right: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.file-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.file-icon i {
+    font-size: 20px;
+    color: #8E8E93;
+}
+
+.file-details {
+    flex: 1;
+    overflow: hidden;
+}
+
+.file-name {
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.file-info {
+    font-size: 13px;
+    color: #8E8E93;
+    display: flex;
+    align-items: center;
+}
+
+.file-status {
+    margin-left: 8px;
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    background-color: rgba(0, 122, 255, 0.1);
+    color: #007AFF;
+}
+
+.file-status.done {
+    background-color: rgba(52, 199, 89, 0.1);
+    color: #34C759;
+}
+
+.file-status.pending {
+    background-color: rgba(255, 204, 0, 0.1);
+    color: #FF9500;
+}
+
+/* 进度条 */
+.progress-bar-container {
+    margin: 16px 0;
+}
+
+.progress-bar-bg {
+    height: 6px;
+    background-color: #E5E5EA;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(to right, #007AFF, #34C759);
+    border-radius: 3px;
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.progress-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: #8E8E93;
+    margin-top: 8px;
+}
+
+/* 传输汇总卡片 */
+.summary-card {
+    background-color: white;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.summary-card-title {
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.summary-item:last-child {
+    border-bottom: none;
+}
+
+.summary-label {
+    font-size: 15px;
+    color: #8E8E93;
+}
+
+.summary-value {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+/* 取消按钮 */
+.cancel-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 16px 0;
+    background-color: #FF3B30;
+    color: white;
+    font-size: 17px;
+    font-weight: 600;
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 4px 12px rgba(255, 59, 48, 0.2);
+    transition: all 0.2s ease;
+    cursor: pointer;
+    margin-bottom: 32px;
+}
+
+.cancel-button:active {
+    background-color: #FF453A;
+    transform: scale(0.98);
+}
+
+.cancel-button i {
+    margin-right: 8px;
+} 

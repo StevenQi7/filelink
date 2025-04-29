@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FileLink 原型</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f5f5f7;
+        }
+        .device-frame {
+            width: 375px;
+            height: 812px;
+            border-radius: 40px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin: 30px;
+            position: relative;
+            background-color: white;
+            border: 10px solid #111;
+        }
+        .device-notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 180px;
+            height: 30px;
+            background-color: #111;
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+            z-index: 10;
+        }
+        .device-status-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 44px;
+            background-color: #fff;
+            z-index: 9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: #000;
+        }
+        .device-status-bar .left {
+            display: flex;
+            align-items: center;
+        }
+        .device-status-bar .center {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .device-status-bar .right {
+            display: flex;
+            align-items: center;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .title-bar {
+            background-color: #f0f0f0;
+            padding: 8px 16px;
+            font-weight: bold;
+            border-bottom: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-8">
+    <div class="container mx-auto">
+        <h1 class="text-3xl font-bold text-center mb-8">FileLink 应用原型</h1>
+        
+        <div class="flex flex-wrap justify-center">
+            <!-- 主页面 -->
+            <div class="flex flex-col items-center">
+                <div class="title-bar w-full text-center">主页面</div>
+                <div class="device-frame">
+                    <div class="device-notch"></div>
+                    <iframe src="home.html"></iframe>
+                </div>
+            </div>
+            
+            <!-- 创建房间页面 -->
+            <div class="flex flex-col items-center">
+                <div class="title-bar w-full text-center">创建房间</div>
+                <div class="device-frame">
+                    <div class="device-notch"></div>
+                    <iframe src="create_room.html"></iframe>
+                </div>
+            </div>
+            
+            <!-- 加入房间页面 -->
+            <div class="flex flex-col items-center">
+                <div class="title-bar w-full text-center">加入房间</div>
+                <div class="device-frame">
+                    <div class="device-notch"></div>
+                    <iframe src="join_room.html"></iframe>
+                </div>
+            </div>
+            
+            <!-- 文件选择页面 -->
+            <div class="flex flex-col items-center">
+                <div class="title-bar w-full text-center">文件选择</div>
+                <div class="device-frame">
+                    <div class="device-notch"></div>
+                    <iframe src="file_select.html"></iframe>
+                </div>
+            </div>
+            
+            <!-- 文件发送页面 -->
+            <div class="flex flex-col items-center">
+                <div class="title-bar w-full text-center">文件发送</div>
+                <div class="device-frame">
+                    <div class="device-notch"></div>
+                    <iframe src="transfer_sender.html"></iframe>
+                </div>
+            </div>
+            
+            <!-- 文件接收页面 -->
+            <div class="flex flex-col items-center">
+                <div class="title-bar w-full text-center">文件接收</div>
+                <div class="device-frame">
+                    <div class="device-notch"></div>
+                    <iframe src="transfer_receiver.html"></iframe>
+                </div>
+            </div>
+            
+            <!-- 历史记录页面 -->
+            <div class="flex flex-col items-center">
+                <div class="title-bar w-full text-center">历史记录</div>
+                <div class="device-frame">
+                    <div class="device-notch"></div>
+                    <iframe src="history.html"></iframe>
+                </div>
+            </div>
+            
+            <!-- 设置页面 -->
+            <div class="flex flex-col items-center">
+                <div class="title-bar w-full text-center">设置</div>
+                <div class="device-frame">
+                    <div class="device-notch"></div>
+                    <iframe src="settings.html"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 
