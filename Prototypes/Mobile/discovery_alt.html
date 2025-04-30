@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FileLink - 发现</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        /* 优化雷达动画 */
+        .radar-container {
+            position: relative;
+            width: 320px;
+            height: 320px;
+            margin: 30px auto 40px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(82, 113, 255, 0.05) 0%, rgba(82, 113, 255, 0.02) 70%, rgba(82, 113, 255, 0.01) 100%);
+            overflow: hidden;
+            box-shadow: inset 0 0 30px rgba(82, 113, 255, 0.05);
+        }
+        
+        /* 雷达圆环 */
+        .radar-circle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            border: 1px solid rgba(82, 113, 255, 0.2);
+            box-shadow: 0 0 5px rgba(82, 113, 255, 0.1);
+        }
+        
+        .radar-circle-1 {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .radar-circle-2 {
+            width: 66%;
+            height: 66%;
+        }
+        
+        .radar-circle-3 {
+            width: 33%;
+            height: 33%;
+        }
+        
+        /* 十字线 */
+        .radar-line {
+            position: absolute;
+            background-color: rgba(82, 113, 255, 0.1);
+        }
+        
+        .radar-line-h {
+            width: 100%;
+            height: 1px;
+            top: 50%;
+            left: 0;
+        }
+        
+        .radar-line-v {
+            width: 1px;
+            height: 100%;
+            top: 0;
+            left: 50%;
+        }
+        
+        /* 雷达中心点 */
+        .radar-center {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px rgba(82, 113, 255, 0.7), 0 0 20px rgba(82, 113, 255, 0.3);
+            z-index: 30;
+        }
+        
+        /* 雷达扫描线 */
+        .radar-scanner {
+            position: absolute;
+            width: 50%;
+            height: 2px;
+            background: linear-gradient(to right, rgba(82, 113, 255, 0.7), transparent);
+            top: 50%;
+            left: 50%;
+            transform-origin: left;
+            z-index: 20;
+            animation: scan 4s infinite linear;
+        }
+        
+        @keyframes scan {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        
+        /* 雷达脉冲效果 */
+        .radar-pulse {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 320px;
+            height: 320px;
+            background: conic-gradient(from 90deg, transparent 0deg, rgba(82, 113, 255, 0.15) 80deg, transparent 160deg);
+            transform: translate(-50%, -50%) rotate(0deg);
+            border-radius: 50%;
+            animation: pulse-rotate 4s infinite linear;
+            z-index: 10;
+        }
+        
+        @keyframes pulse-rotate {
+            0% {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+            100% {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
+        
+        /* 波纹效果 */
+        .ripple {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: transparent;
+            border: 2px solid rgba(82, 113, 255, 0.5);
+            animation: ripple 3s linear infinite;
+            z-index: 10;
+        }
+        
+        @keyframes ripple {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 1;
+                border-width: 2px;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(15);
+                opacity: 0;
+                border-width: 1px;
+            }
+        }
+        
+        /* 底部导航栏 */
+        .bottom-nav-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 70px;
+            background-color: transparent;
+            z-index: 50;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+        }
+        
+        .bottom-line {
+            position: absolute;
+            bottom: 8px;
+            width: 134px;
+            height: 5px;
+            background-color: #000;
+            border-radius: 2.5px;
+            opacity: 0.4;
+        }
+        
+        /* 底部按钮布局 */
+        .bottom-actions {
+            position: fixed;
+            bottom: 30px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            padding: 0 30px;
+        }
+        
+        .action-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background-color: var(--background-color);
+            color: #888;
+            box-shadow: var(--shadow-default);
+            transition: all 0.2s ease;
+        }
+        
+        .btn-settings, .btn-receive {
+            font-size: 18px;
+        }
+        
+        .action-btn:active {
+            transform: scale(0.95);
+            opacity: 0.9;
+        }
+        
+        /* 添加中间按钮 */
+        .action-btn.btn-center {
+            background-color: var(--background-color);
+            width: 55px;
+            height: 55px;
+            font-size: 22px;
+            position: relative;
+            z-index: 110;
+            color: #555;
+        }
+        
+        /* 优化设备在雷达上的显示 */
+        .device {
+            position: absolute;
+            cursor: pointer;
+            z-index: 40;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 90px;
+            transform: translate(-50%, -50%);
+            background-color: transparent;
+            border: none;
+            outline: none;
+            box-sizing: border-box;
+            text-shadow: none;
+            box-shadow: none;
+        }
+        
+        .device-icon {
+            width: 42px;
+            height: 42px;
+            background-color: transparent;
+            color: rgba(82, 113, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 6px;
+            transition: all 0.3s ease;
+            border: none;
+            outline: none;
+            box-shadow: none;
+            border-radius: 0;
+            text-shadow: none;
+        }
+        
+        .device-name {
+            font-size: 11px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            background-color: transparent;
+            padding: 0;
+            width: 100%;
+            text-align: center;
+            overflow: visible;
+            white-space: normal;
+            max-height: none;
+            line-height: 1.2;
+            border: none;
+            outline: none;
+            box-shadow: none;
+            border-radius: 0;
+            text-shadow: none;
+            margin: 0;
+        }
+        
+        .device.selected .device-icon {
+            background-color: transparent;
+            color: rgba(82, 113, 255, 1);
+            transform: scale(1.2);
+            box-shadow: none;
+            border: none;
+            text-shadow: none;
+        }
+        
+        .device.selected .device-name {
+            font-weight: 600;
+            color: rgba(82, 113, 255, 1);
+            text-shadow: none;
+            border: none;
+            background: transparent;
+        }
+        
+        /* 接收面板 */
+        .receive-panel {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--surface-color);
+            border-radius: 24px 24px 0 0;
+            padding: 20px;
+            z-index: 1000;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            box-shadow: var(--shadow-default);
+        }
+        
+        .receive-panel.show {
+            transform: translateY(0);
+        }
+        
+        .tab-container {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            border-bottom: 2px solid transparent;
+        }
+        
+        .tab.active {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .qr-scanner {
+            width: 250px;
+            height: 250px;
+            margin: 0 auto 20px;
+            background-color: var(--background-color);
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .scan-line {
+            position: absolute;
+            height: 2px;
+            width: 100%;
+            background-color: var(--primary-color);
+            top: 0;
+            left: 0;
+            box-shadow: 0 0 8px var(--primary-color);
+            animation: scan 2s infinite alternate ease-in-out;
+        }
+        
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 248px; }
+        }
+        
+        .scan-corners {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+        }
+        
+        .scan-corner {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-color: var(--primary-color);
+            border-width: 3px;
+            border-style: solid;
+        }
+        
+        .top-left {
+            top: 10px;
+            left: 10px;
+            border-right: none;
+            border-bottom: none;
+        }
+        
+        .top-right {
+            top: 10px;
+            right: 10px;
+            border-left: none;
+            border-bottom: none;
+        }
+        
+        .bottom-left {
+            bottom: 10px;
+            left: 10px;
+            border-right: none;
+            border-top: none;
+        }
+        
+        .bottom-right {
+            bottom: 10px;
+            right: 10px;
+            border-left: none;
+            border-top: none;
+        }
+        
+        /* 内容区域调整 */
+        .content-wrapper {
+            padding-bottom: 90px;
+        }
+        
+        /* 状态指示器 */
+        .status-indicator {
+            margin: 15px auto 20px;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 14px;
+            padding: 8px 0;
+            background-color: var(--background-color);
+            border-radius: 8px;
+            width: 80%;
+            box-shadow: var(--shadow-default);
+        }
+        
+        .scanning-text {
+            display: inline-block;
+            margin-left: 8px;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+        
+        /* 设备点 */
+        .radar-dot {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background-color: rgba(82, 113, 255, 0.8);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 8px rgba(82, 113, 255, 0.8);
+            z-index: 35;
+            animation: dot-blink 2s infinite alternate;
+            border: none;
+            outline: none;
+        }
+        
+        @keyframes dot-blink {
+            0% {
+                opacity: 0.5;
+                box-shadow: 0 0 4px rgba(82, 113, 255, 0.5);
+            }
+            100% {
+                opacity: 1;
+                box-shadow: 0 0 8px rgba(82, 113, 255, 0.8);
+            }
+        }
+
+        .password-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s;
+        }
+
+        .password-modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .password-container {
+            width: 300px;
+            background-color: var(--surface-color);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--shadow-default);
+        }
+
+        .password-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+            text-align: center;
+        }
+
+        .password-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .password-buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* 设置面板 */
+        .settings-panel {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 70%;
+            background-color: var(--surface-color);
+            z-index: 1000;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            border-radius: 24px 24px 0 0;
+        }
+
+        .settings-panel.show {
+            transform: translateY(0);
+        }
+
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .settings-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .settings-close {
+            font-size: 24px;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .settings-content {
+            padding: 20px;
+            height: calc(100% - 60px);
+            overflow-y: auto;
+        }
+
+        .settings-section {
+            margin-bottom: 30px;
+        }
+
+        .settings-section-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 15px;
+        }
+
+        .settings-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .settings-item-label {
+            font-size: 16px;
+            color: var(--text-primary);
+        }
+
+        /* 文件选择器 */
+        .file-selector {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--surface-color);
+            border-radius: 24px 24px 0 0;
+            padding: 20px 0;
+            z-index: 1000;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            box-shadow: var(--shadow-default);
+        }
+
+        .file-selector.show {
+            transform: translateY(0);
+        }
+
+        .file-selector-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px 16px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 16px;
+        }
+
+        /* 选择了设备的样式 */
+        #deviceSelectedInfo {
+            color: var(--primary-color);
+        }
+
+        .file-options {
+            padding: 0 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="iphone-frame">
+        <!-- 状态栏 -->
+        <div class="status-bar">
+            <span>9:41</span>
+            <div>
+                <i class="fas fa-signal"></i>
+                <i class="fas fa-wifi"></i>
+                <i class="fas fa-battery-full"></i>
+            </div>
+        </div>
+
+        <!-- 主内容区域 -->
+        <div class="app-content">
+            <div class="content-wrapper" style="padding-top: 20px;">
+                <header style="text-align: center; padding: 15px;">
+                    <h1 style="font-size: 24px; font-weight: 600;">FileLink</h1>
+                    <p style="color: var(--text-secondary); margin-top: 2px;">在您周围搜索设备</p>
+                </header>
+                
+                <div class="status-indicator">
+                    <i class="fas fa-sync fa-spin"></i>
+                    <span class="scanning-text">正在扫描周围设备...</span>
+                </div>
+
+                <!-- 雷达区域 -->
+                <div class="radar-container">
+                    <!-- 雷达圆环 -->
+                    <div class="radar-circle radar-circle-1"></div>
+                    <div class="radar-circle radar-circle-2"></div>
+                    <div class="radar-circle radar-circle-3"></div>
+                    
+                    <!-- 十字线 -->
+                    <div class="radar-line radar-line-h"></div>
+                    <div class="radar-line radar-line-v"></div>
+                    
+                    <!-- 雷达脉冲 -->
+                    <div class="radar-pulse"></div>
+                    
+                    <!-- 雷达扫描线 -->
+                    <div class="radar-scanner"></div>
+                    
+                    <!-- 设备点 -->
+                    <div class="radar-dot" style="top: 30%; left: 60%;"></div>
+                    <div class="radar-dot" style="top: 60%; left: 40%;"></div>
+                    <div class="radar-dot" style="top: 45%; left: 70%;"></div>
+                    
+                    <!-- 雷达中心点 -->
+                    <div class="radar-center"></div>
+                    
+                    <!-- 设备图标示例 -->
+                    <div class="device" data-device-id="1" data-device-name="MacBook Pro" style="top: 30%; left: 60%;">
+                        <div class="device-icon">
+                            <i class="fas fa-laptop"></i>
+                        </div>
+                        <div class="device-name">MacBook Pro</div>
+                    </div>
+                    <div class="device" data-device-id="2" data-device-name="iPad Air" style="top: 60%; left: 40%;">
+                        <div class="device-icon">
+                            <i class="fas fa-tablet-alt"></i>
+                        </div>
+                        <div class="device-name">iPad Air</div>
+                    </div>
+                    <div class="device" data-device-id="3" data-device-name="iPhone 13" style="top: 45%; left: 70%;">
+                        <div class="device-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <div class="device-name">iPhone 13</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 底部按钮 -->
+            <div class="bottom-actions">
+                <div class="action-btn btn-settings" id="settingsBtn">
+                    <i class="fas fa-cog"></i>
+                </div>
+                <div class="action-btn btn-center" id="sendFileBtn">
+                    <i class="fas fa-paper-plane"></i>
+                </div>
+                <div class="action-btn btn-receive" id="receiveBtn">
+                    <i class="fas fa-download"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 底部导航条 -->
+    <div class="bottom-nav-bar">
+        <div class="bottom-line"></div>
+    </div>
+
+    <!-- 密码口令模态框 -->
+    <div class="password-modal" id="passwordModal">
+        <div class="password-container">
+            <input type="text" class="password-input" placeholder="请输入6位口令" id="passwordInput">
+            <div class="password-buttons">
+                <button class="btn btn-surface" id="cancelPassword">取消</button>
+                <button class="btn btn-primary" id="confirmPassword">连接</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加遮罩层 -->
+    <div class="panel-backdrop" id="panelBackdrop"></div>
+
+    <!-- 设置面板 -->
+    <div class="settings-panel" id="settingsPanel">
+        <div class="settings-header">
+            <div class="settings-title">设置</div>
+            <div class="settings-close" id="closeSettings">&times;</div>
+        </div>
+        <div class="settings-content">
+            <div class="settings-section">
+                <div class="settings-section-title">通用设置</div>
+                <div class="settings-item">
+                    <div class="settings-item-label">设备名称</div>
+                    <div>iPhone 15 Pro</div>
+                </div>
+                <div class="settings-item">
+                    <div class="settings-item-label">默认保存路径</div>
+                    <div>下载/FileLink</div>
+                </div>
+                <div class="settings-item">
+                    <div class="settings-item-label">传输完成提醒</div>
+                    <label class="switch">
+                        <input type="checkbox" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <div class="settings-section-title">安全设置</div>
+                <div class="settings-item">
+                    <div class="settings-item-label">自动接收文件</div>
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="settings-item">
+                    <div class="settings-item-label">加密传输</div>
+                    <label class="switch">
+                        <input type="checkbox" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="settings-item">
+                    <div class="settings-item-label">隐私模式</div>
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <div class="settings-section-title">应用信息</div>
+                <div class="settings-item">
+                    <div class="settings-item-label">版本</div>
+                    <div>1.0.0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 文件选择器 -->
+    <div class="file-selector" id="fileSelector">
+        <div class="file-selector-header">
+            <div class="settings-title">选择文件</div>
+            <div class="settings-close" id="closeFileSelector">&times;</div>
+        </div>
+        
+        <!-- 选择了设备时显示 -->
+        <div id="deviceSelectedInfo" style="padding: 0 10px 16px; color: var(--primary-color); display: none;">
+            <i class="fas fa-info-circle"></i> 
+            <span>选择文件后将发送到：<strong id="selectedDeviceName">设备名称</strong></span>
+        </div>
+        
+        <!-- 未选择设备时显示的公网传输面板 -->
+        <div id="noDeviceSelectedInfo" style="padding: 0 20px 16px; display: none;">
+            <!-- 传输密码部分 -->
+            <div style="text-align: center; margin: 10px 0 20px; background-color: var(--background-color); padding: 16px; border-radius: 12px;">
+                <p style="color: var(--text-secondary); margin-bottom: 10px; font-size: 14px;">
+                    您的传输密码已生成，接收方需要输入此密码
+                </p>
+                <div style="font-size: 28px; letter-spacing: 8px; font-weight: 600; color: var(--primary-color);">
+                    <span id="transferCode">835719</span>
+                </div>
+                <button class="btn btn-small" id="copyTransferCode" style="margin-top: 8px; padding: 6px 12px; font-size: 13px;">
+                    <i class="fas fa-copy" style="margin-right: 5px;"></i>复制密码
+                </button>
+            </div>
+            
+            <p style="color: var(--text-secondary); margin-bottom: 15px; font-size: 14px;">
+                选择要通过公网传输的文件
+            </p>
+            
+            <label for="internet-file-input" class="btn btn-primary" style="width: 100%; display: flex; align-items: center; justify-content: center; margin-bottom: 15px;">
+                <i class="fas fa-file" style="margin-right: 10px;"></i>
+                选择文件
+            </label>
+            <input type="file" id="internet-file-input" multiple style="display: none;">
+            
+            <label for="internet-folder-input" class="btn btn-surface" style="width: 100%;">
+                <i class="fas fa-folder" style="margin-right: 10px;"></i>
+                选择文件夹
+            </label>
+            <input type="file" id="internet-folder-input" webkitdirectory directory multiple style="display: none;">
+            
+            <!-- 修改已选择文件部分，默认隐藏 -->
+            <div id="selected-internet-files" style="margin-top: 20px; display: none;">
+                <div style="background-color: var(--background-color); border-radius: 10px; padding: 15px; margin-bottom: 20px;">
+                    <div style="font-weight: 500; margin-bottom: 10px; color: var(--text-primary);">已选择文件</div>
+                    <div id="selectedFilesList" style="max-height: 200px; overflow-y: auto;">
+                        <!-- 选择的文件将显示在这里 -->
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary" id="startInternetFileTransfer" style="width: 100%;">
+                    开始传输文件
+                </button>
+            </div>
+        </div>
+        
+        <!-- 局域网传输选项 -->
+        <div class="file-options" id="localTransferOptions">
+            <div style="padding: 20px; text-align: center;">
+                <p style="margin-bottom: 20px; color: var(--text-secondary);">选择要传输的文件</p>
+                
+                <label for="local-file-input" class="btn btn-primary" style="width: 100%; display: flex; align-items: center; justify-content: center; margin-bottom: 15px;">
+                    <i class="fas fa-file" style="margin-right: 10px;"></i>
+                    选择文件
+                </label>
+                <input type="file" id="local-file-input" multiple style="display: none;">
+                
+                <label for="local-folder-input" class="btn btn-surface" style="width: 100%;">
+                    <i class="fas fa-folder" style="margin-right: 10px;"></i>
+                    选择文件夹
+                </label>
+                <input type="file" id="local-folder-input" webkitdirectory directory multiple style="display: none;">
+                
+                <div id="selected-local-files" style="margin-top: 20px; text-align: left; display: none;">
+                    <h4 style="margin-bottom: 10px; font-size: 16px;">已选择的文件</h4>
+                    <div id="local-files-list" style="max-height: 200px; overflow-y: auto;">
+                        <!-- 选择的文件将显示在这里 -->
+                    </div>
+                    
+                    <button id="start-local-transfer" class="btn btn-primary" style="width: 100%; margin-top: 15px;">
+                        <i class="fas fa-paper-plane" style="margin-right: 8px;"></i>
+                        开始传输
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 接收文件面板 -->
+    <div class="receive-panel" id="receivePanel">
+        <div class="tab-container">
+            <div class="tab active" data-tab="code">输入口令</div>
+            <div class="tab" data-tab="qr">扫描二维码</div>
+        </div>
+        
+        <div class="tab-content active" id="codeTab">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <p style="color: var(--text-secondary); margin-bottom: 16px;">请输入发送方提供的6位连接口令</p>
+                <input type="text" class="password-input" style="width: 80%; text-align: center; font-size: 24px; letter-spacing: 8px;" maxlength="6" placeholder="______">
+                <button class="btn btn-primary" style="width: 80%; margin-top: 20px;">
+                    <i class="fas fa-link" style="margin-right: 8px;"></i>连接
+                </button>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="qrTab">
+            <div style="text-align: center;">
+                <p style="color: var(--text-secondary); margin-bottom: 16px;">请扫描发送方的二维码</p>
+                
+                <div class="qr-scanner">
+                    <div class="scan-line"></div>
+                    <div class="scan-corners">
+                        <div class="scan-corner top-left"></div>
+                        <div class="scan-corner top-right"></div>
+                        <div class="scan-corner bottom-left"></div>
+                        <div class="scan-corner bottom-right"></div>
+                    </div>
+                </div>
+                
+                <p style="color: var(--text-secondary); font-size: 14px;">
+                    <i class="fas fa-info-circle"></i> 将二维码对准扫描框
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 文件传输进度界面 -->
+    <div class="transfer-progress-panel" id="transferProgressPanel" style="display: none; position: fixed; bottom: 0; left: 0; width: 100%; height: 70%; background-color: var(--surface-color); border-radius: 24px 24px 0 0; padding: 20px; z-index: 1000; transform: translateY(100%); transition: transform 0.3s ease; box-shadow: var(--shadow-default);">
+        <div class="settings-header">
+            <div class="settings-title">文件传输</div>
+            <div class="settings-close" id="closeTransferPanel">&times;</div>
+        </div>
+        
+        <!-- 传输状态和详情 -->
+        <div style="padding: 20px 0;">
+            <div id="transferMode" style="text-align: center; margin-bottom: 16px; font-weight: 500; color: var(--primary-color);">
+                <!-- 动态填充：局域网传输/公网传输 -->
+            </div>
+            
+            <div id="transferTargetInfo" style="display: flex; align-items: center; margin-bottom: 20px; padding: 12px; border-radius: 12px; background-color: var(--background-color);">
+                <div style="margin-right: 12px; width: 40px; height: 40px; background-color: rgba(82, 113, 255, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <i id="targetDeviceIcon" class="fas fa-laptop" style="font-size: 18px; color: var(--primary-color);"></i>
+                </div>
+                <div style="flex: 1;">
+                    <div id="targetDeviceName" style="font-weight: 600; color: var(--text-primary);">MacBook Pro</div>
+                    <div id="targetConnectionInfo" style="font-size: 13px; color: var(--text-secondary);">局域网连接</div>
+                </div>
+                <div id="transferStatus" style="padding: 4px 10px; border-radius: 12px; font-size: 12px; background-color: rgba(82, 113, 255, 0.1); color: var(--primary-color);">
+                    准备中
+                </div>
+            </div>
+        </div>
+        
+        <!-- 文件列表 -->
+        <div class="transfer-files">
+            <h4 style="margin-bottom: 12px; font-size: 15px; color: var(--text-primary);">传输文件</h4>
+            <div id="transferFilesList" style="margin-bottom: 16px; max-height: 200px; overflow-y: auto;">
+                <!-- 文件项将由JS动态添加 -->
+            </div>
+            
+            <!-- 总进度条 -->
+            <div style="margin-top: 20px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                    <span style="font-size: 14px; color: var(--text-primary);">总进度</span>
+                    <span id="totalProgressPercent" style="font-size: 14px; font-weight: 500; color: var(--primary-color);">0%</span>
+                </div>
+                <div style="height: 8px; background-color: var(--background-color); border-radius: 4px; overflow: hidden;">
+                    <div id="totalProgressBar" style="height: 100%; width: 0%; background: linear-gradient(to right, var(--primary-color), var(--secondary-color)); border-radius: 4px; transition: width 0.3s ease;"></div>
+                </div>
+            </div>
+            
+            <!-- 传输速度和剩余时间 -->
+            <div style="display: flex; justify-content: space-between; margin-top: 10px;">
+                <div style="font-size: 13px; color: var(--text-secondary);">
+                    <i class="fas fa-tachometer-alt" style="margin-right: 5px;"></i>
+                    <span id="transferSpeed">-- MB/s</span>
+                </div>
+                <div style="font-size: 13px; color: var(--text-secondary);">
+                    <i class="fas fa-clock" style="margin-right: 5px;"></i>
+                    <span id="transferTimeRemaining">计算中...</span>
+                </div>
+            </div>
+            
+            <!-- 取消按钮 -->
+            <button id="cancelTransferBtn" class="btn" style="width: 100%; margin-top: 20px; background-color: var(--error-color); color: white;">
+                <i class="fas fa-times" style="margin-right: 8px;"></i>取消传输
+            </button>
+        </div>
+    </div>
+
+    <!-- 引入拆分后的JS文件 -->
+    <script src="../js/radarDisplay.js"></script>
+    <script src="../js/uiControls.js"></script>
+    <script src="../js/fileSelectors.js"></script>
+    <script src="../js/internetFileTransfer.js"></script>
+    <script src="../js/transferProgress.js"></script>
+    <script>
+        // 密码模态框下滑关闭功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const passwordModal = document.getElementById('passwordModal');
+            const passwordContainer = passwordModal.querySelector('.password-container');
+            const cancelPassword = document.getElementById('cancelPassword');
+            let startY, currentY;
+            let isDragging = false;
+            
+            // 关闭模态框函数
+            function closePasswordModal() {
+                passwordModal.classList.remove('show');
+            }
+            
+            // 取消按钮点击事件
+            cancelPassword.addEventListener('click', closePasswordModal);
+            
+            // 点击背景关闭模态框
+            passwordModal.addEventListener('click', function(e) {
+                if (e.target === passwordModal) {
+                    closePasswordModal();
+                }
+            });
+            
+            // 触摸开始
+            passwordContainer.addEventListener('touchstart', function(e) {
+                startY = e.touches[0].clientY;
+                isDragging = true;
+            });
+            
+            // 触摸移动
+            passwordContainer.addEventListener('touchmove', function(e) {
+                if (!isDragging) return;
+                
+                currentY = e.touches[0].clientY;
+                const diffY = currentY - startY;
+                
+                // 只允许向下滑动
+                if (diffY > 0) {
+                    passwordContainer.style.transform = `translateY(${diffY}px)`;
+                    e.preventDefault();
+                }
+            });
+            
+            // 触摸结束
+            passwordContainer.addEventListener('touchend', function() {
+                if (!isDragging) return;
+                
+                const diffY = currentY - startY;
+                
+                // 如果滑动超过容器高度的30%，关闭模态框
+                if (diffY > passwordContainer.offsetHeight * 0.3) {
+                    closePasswordModal();
+                } else {
+                    // 否则恢复原位
+                    passwordContainer.style.transform = '';
+                }
+                
+                isDragging = false;
+            });
+            
+            // 添加模拟打开模态框按钮事件
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    if (tabId === 'code') {
+                        // 激活当前标签页
+                        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        // 显示对应内容
+                        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                        document.getElementById('codeTab').classList.add('active');
+                    }
+                });
+            });
+            
+            // 监听连接按钮点击事件
+            const connectButton = document.querySelector('#codeTab .btn-primary');
+            if (connectButton) {
+                connectButton.addEventListener('click', function() {
+                    // 显示密码模态框
+                    passwordModal.classList.add('show');
+                });
+            }
+        });
+    </script>
+</body>
+</html> 
