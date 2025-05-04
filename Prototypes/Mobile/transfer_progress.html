@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FileLink - 传输进度</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/modern.css">
+    <style>
+        .transfer-card {
+            margin-bottom: var(--spacing-xl);
+            overflow: hidden;
+        }
+        
+        .transfer-header {
+            padding: var(--spacing-md) 0;
+            margin-bottom: var(--spacing-md);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .transfer-status {
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--success-color);
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .time-remaining {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        .progress-container {
+            position: relative;
+            height: 8px;
+            background-color: var(--bg-color);
+            border-radius: var(--border-radius-full);
+            overflow: hidden;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .progress-bar {
+            position: absolute;
+            height: 100%;
+            background: var(--primary-gradient);
+            border-radius: var(--border-radius-full);
+            transition: width 0.3s ease;
+        }
+        
+        .transfer-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: var(--spacing-sm) 0;
+            margin-bottom: var(--spacing-xs);
+            border-bottom: var(--border-width) solid var(--border-color);
+        }
+        
+        .file-item:last-child {
+            margin-bottom: 0;
+            border-bottom: none;
+        }
+        
+        .file-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--border-radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bg-color);
+            margin-right: var(--spacing-sm);
+            flex-shrink: 0;
+        }
+        
+        .file-info {
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        .file-name {
+            font-weight: 500;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .file-meta {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .file-status {
+            font-size: 12px;
+            font-weight: 500;
+            padding: 2px 8px;
+            border-radius: var(--border-radius-full);
+            background-color: var(--bg-color);
+        }
+        
+        .status-pending {
+            color: var(--text-secondary);
+        }
+        
+        .status-transferring {
+            color: var(--primary-color);
+            background-color: rgba(71, 118, 230, 0.1);
+        }
+        
+        .status-complete {
+            color: var(--success-color);
+            background-color: rgba(54, 179, 126, 0.1);
+        }
+        
+        .connection-info {
+            margin-top: var(--spacing-xl);
+            background-color: var(--bg-color);
+            border-radius: var(--border-radius-md);
+            padding: var(--spacing-md);
+        }
+        
+        .connection-info h3 {
+            font-size: 16px;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-sm);
+            font-size: 14px;
+        }
+        
+        .info-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .info-label {
+            color: var(--text-secondary);
+        }
+        
+        .info-value {
+            font-weight: 500;
+        }
+        
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            margin-top: var(--spacing-xl);
+        }
+        
+        .cancel-btn {
+            width: 100%;
+            max-width: 300px;
+            background-color: white;
+            border: 1px solid #FF5A5A;
+            color: #FF5A5A;
+            font-weight: 600;
+            border-radius: var(--border-radius-md);
+            padding: var(--spacing-md) var(--spacing-lg);
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-sm);
+            transition: all 0.2s ease;
+        }
+        
+        .cancel-btn:active {
+            background-color: rgba(255, 90, 90, 0.1);
+            transform: scale(0.98);
+        }
+        
+        .cancel-btn i {
+            font-size: 18px;
+        }
+        
+        /* 设备连接图标 - 新设计 */
+        .transfer-visualization {
+            height: 200px;
+            position: relative;
+            margin: var(--spacing-xl) 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        
+        .transfer-scene {
+            width: 260px;
+            height: 140px;
+            position: relative;
+            perspective: 800px;
+        }
+        
+        .device-container {
+            position: absolute;
+            width: 75px;
+            height: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .device-container.source {
+            left: 0;
+            top: 20px;
+        }
+        
+        .device-container.target {
+            right: 0;
+            top: 20px;
+        }
+        
+        .device-card {
+            width: 72px;
+            height: 72px;
+            border-radius: 18px;
+            background-color: white;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform-style: preserve-3d;
+            position: relative;
+        }
+        
+        .device-card.source {
+            box-shadow: 0 4px 24px rgba(71, 118, 230, 0.15);
+        }
+        
+        .device-card.target {
+            box-shadow: 0 4px 24px rgba(54, 179, 126, 0.15);
+        }
+        
+        .device-icon {
+            font-size: 28px;
+            z-index: 2;
+        }
+        
+        .source .device-icon {
+            color: var(--primary-color);
+        }
+        
+        .target .device-icon {
+            color: var(--success-color);
+        }
+        
+        .device-name {
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 8px;
+            color: var(--text-primary);
+        }
+        
+        .device-glow {
+            position: absolute;
+            width: 120%;
+            height: 120%;
+            border-radius: 24px;
+            z-index: -1;
+            opacity: 0.2;
+            filter: blur(8px);
+        }
+        
+        .source .device-glow {
+            background: radial-gradient(circle, var(--primary-color) 0%, transparent 70%);
+            animation: sourceGlow 2s infinite alternate;
+        }
+        
+        .target .device-glow {
+            background: radial-gradient(circle, var(--success-color) 0%, transparent 70%);
+            animation: targetGlow 2s infinite alternate;
+        }
+        
+        @keyframes sourceGlow {
+            0% { opacity: 0.1; transform: scale(0.9); }
+            100% { opacity: 0.25; transform: scale(1.1); }
+        }
+        
+        @keyframes targetGlow {
+            0% { opacity: 0.1; transform: scale(0.9); }
+            100% { opacity: 0.25; transform: scale(1.1); }
+        }
+        
+        .transfer-path {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100px;
+            height: 40px;
+            transform: translate(-50%, -50%);
+            overflow: visible;
+        }
+        
+        .connection-arc {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 100% 100% 0 0 / 100% 100% 0 0;
+            border-top: 2px dashed rgba(71, 118, 230, 0.3);
+            z-index: -1;
+        }
+        
+        .data-particle-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+        }
+        
+        .data-particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            box-shadow: 0 0 8px var(--primary-color);
+            opacity: 0;
+        }
+        
+        .particle-1 {
+            animation: moveParticle1 2s infinite;
+            animation-delay: 0s;
+        }
+        
+        .particle-2 {
+            animation: moveParticle2 2s infinite;
+            animation-delay: 0.3s;
+        }
+        
+        .particle-3 {
+            animation: moveParticle3 2s infinite;
+            animation-delay: 0.6s;
+        }
+        
+        .particle-4 {
+            animation: moveParticle4 2s infinite;
+            animation-delay: 0.9s;
+        }
+        
+        .particle-5 {
+            animation: moveParticle5 2s infinite;
+            animation-delay: 1.2s;
+        }
+        
+        @keyframes moveParticle1 {
+            0% { left: 0; top: 10px; opacity: 0; }
+            10% { opacity: 0.8; }
+            50% { top: -15px; }
+            90% { opacity: 0.8; }
+            100% { left: 100%; top: 10px; opacity: 0; }
+        }
+        
+        @keyframes moveParticle2 {
+            0% { left: 0; top: 12px; opacity: 0; }
+            10% { opacity: 0.7; }
+            50% { top: -20px; }
+            90% { opacity: 0.7; }
+            100% { left: 100%; top: 12px; opacity: 0; }
+        }
+        
+        @keyframes moveParticle3 {
+            0% { left: 0; top: 14px; opacity: 0; }
+            10% { opacity: 0.9; }
+            50% { top: -10px; }
+            90% { opacity: 0.9; }
+            100% { left: 100%; top: 14px; opacity: 0; }
+        }
+        
+        @keyframes moveParticle4 {
+            0% { left: 0; top: 16px; opacity: 0; }
+            10% { opacity: 0.6; }
+            50% { top: -18px; }
+            90% { opacity: 0.6; }
+            100% { left: 100%; top: 16px; opacity: 0; }
+        }
+        
+        @keyframes moveParticle5 {
+            0% { left: 0; top: 18px; opacity: 0; }
+            10% { opacity: 0.7; }
+            50% { top: -12px; }
+            90% { opacity: 0.7; }
+            100% { left: 100%; top: 18px; opacity: 0; }
+        }
+        
+        .transfer-files {
+            position: absolute;
+            transform: translateY(-50%) translateX(-50%);
+            top: 50%;
+            left: 50%;
+            width: 120px;
+            text-align: center;
+        }
+        
+        .transfer-icon {
+            font-size: 16px;
+            color: var(--primary-color);
+            margin-bottom: 4px;
+            opacity: 0.8;
+        }
+        
+        .transfer-text {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        
+        /* 中断传输对话框 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            width: 300px;
+            padding: var(--spacing-xl);
+            background-color: white;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: var(--spacing-md);
+            text-align: center;
+        }
+        
+        .modal-body {
+            font-size: 15px;
+            margin-bottom: var(--spacing-xl);
+            text-align: center;
+            color: var(--text-secondary);
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: var(--spacing-md);
+        }
+    </style>
+</head>
+<body>
+    <div class="iphone-frame">
+        <!-- 状态栏 -->
+        <div class="status-bar">
+            <span>9:41</span>
+            <div>
+                <i class="fas fa-signal"></i>
+                <i class="fas fa-wifi"></i>
+                <i class="fas fa-battery-full"></i>
+            </div>
+        </div>
+
+        <!-- 主内容区域 -->
+        <div class="app-content">
+            <div class="content-wrapper">
+                <div class="navbar">
+                    <div class="btn-icon" id="backButton">
+                        <i class="fas fa-arrow-left"></i>
+                    </div>
+                    <div class="navbar-title">传输进度</div>
+                    <div style="width: 40px;"></div> <!-- 占位 -->
+                </div>
+                
+                <div class="container">
+                    <!-- 设备连接图示 -->
+                    <div class="transfer-visualization">
+                        <div class="transfer-scene">
+                            <!-- 源设备 -->
+                            <div class="device-container source">
+                                <div class="device-card source">
+                                    <div class="device-glow"></div>
+                                    <i class="fas fa-mobile-alt device-icon"></i>
+                                </div>
+                                <div class="device-name">我的手机</div>
+                            </div>
+                            
+                            <!-- 目标设备 -->
+                            <div class="device-container target">
+                                <div class="device-card target">
+                                    <div class="device-glow"></div>
+                                    <i class="fas fa-desktop device-icon"></i>
+                                </div>
+                                <div class="device-name">张小明的电脑</div>
+                            </div>
+                            
+                            <!-- 传输路径和数据流 -->
+                            <div class="transfer-path">
+                                <div class="connection-arc"></div>
+                                <div class="data-particle-container">
+                                    <div class="data-particle particle-1"></div>
+                                    <div class="data-particle particle-2"></div>
+                                    <div class="data-particle particle-3"></div>
+                                    <div class="data-particle particle-4"></div>
+                                    <div class="data-particle particle-5"></div>
+                                </div>
+                                <div class="transfer-files">
+                                    <div class="transfer-icon">
+                                        <i class="fas fa-exchange-alt"></i>
+                                    </div>
+                                    <div class="transfer-text">5.2 MB/s</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 传输进度卡片 -->
+                    <div class="card transfer-card">
+                        <div class="transfer-header">
+                            <div class="transfer-status">
+                                <div class="status-dot"></div>
+                                <span>正在传输</span>
+                            </div>
+                            <div class="time-remaining">预计剩余：2分钟</div>
+                        </div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-bar" style="width: 35%;"></div>
+                        </div>
+                        
+                        <div class="transfer-stats">
+                            <div>245.8 MB / 702.1 MB</div>
+                            <div>5.2 MB/s</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 文件列表 -->
+                    <h3 style="font-size: 16px; margin-bottom: var(--spacing-md);">传输文件（3个）</h3>
+                    
+                    <div class="card">
+                        <!-- 文件项1 -->
+                        <div class="file-item">
+                            <div class="file-icon">
+                                <i class="fas fa-file-video" style="color: #FF6B6B;"></i>
+                            </div>
+                            <div class="file-info">
+                                <div class="file-name">会议演示视频.mp4</div>
+                                <div class="file-meta">
+                                    <span>398.5 MB</span>
+                                    <span>•</span>
+                                    <span>22%</span>
+                                </div>
+                            </div>
+                            <div class="file-status status-transferring">传输中</div>
+                        </div>
+                        
+                        <!-- 文件项2 -->
+                        <div class="file-item">
+                            <div class="file-icon">
+                                <i class="fas fa-file-word" style="color: #4776E6;"></i>
+                            </div>
+                            <div class="file-info">
+                                <div class="file-name">项目计划书.docx</div>
+                                <div class="file-meta">
+                                    <span>3.6 MB</span>
+                                </div>
+                            </div>
+                            <div class="file-status status-complete">已完成</div>
+                        </div>
+                        
+                        <!-- 文件项3 -->
+                        <div class="file-item">
+                            <div class="file-icon">
+                                <i class="fas fa-file-excel" style="color: #36B37E;"></i>
+                            </div>
+                            <div class="file-info">
+                                <div class="file-name">财务报表2023.xlsx</div>
+                                <div class="file-meta">
+                                    <span>300 KB</span>
+                                </div>
+                            </div>
+                            <div class="file-status status-pending">等待中</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 连接信息 -->
+                    <div class="connection-info">
+                        <h3>连接信息</h3>
+                        <div class="info-item">
+                            <div class="info-label">连接方式</div>
+                            <div class="info-value">公网传输</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">接收方</div>
+                            <div class="info-value">张小明的电脑</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">连接密码</div>
+                            <div class="info-value">347921</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">连接时间</div>
+                            <div class="info-value">14:25:30</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 操作按钮 -->
+                    <div class="action-buttons">
+                        <button class="cancel-btn" id="cancelBtn">
+                            <i class="fas fa-stop-circle"></i>
+                            中断传输
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 底部导航条 -->
+            <div class="bottom-nav-bar">
+                <div class="bottom-line"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 中断传输确认对话框 -->
+    <div class="modal" id="cancelModal">
+        <div class="modal-content">
+            <div class="modal-title">确认中断传输？</div>
+            <div class="modal-body">中断传输后，已传输的文件将保留，未完成的文件需要重新传输</div>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary w-full" id="modalCancelBtn">取消</button>
+                <button class="btn w-full" id="confirmCancelBtn">确认</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const backButton = document.getElementById('backButton');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const cancelModal = document.getElementById('cancelModal');
+            const modalCancelBtn = document.getElementById('modalCancelBtn');
+            const confirmCancelBtn = document.getElementById('confirmCancelBtn');
+            const progressBar = document.querySelector('.progress-bar');
+            
+            // 返回按钮点击事件
+            backButton.addEventListener('click', function() {
+                // 提示用户传输正在进行中
+                showToast('传输正在进行中，请先中断或完成传输');
+            });
+            
+            // 中断传输按钮点击事件
+            cancelBtn.addEventListener('click', function() {
+                cancelModal.style.display = 'flex';
+            });
+            
+            // 取消对话框按钮事件
+            modalCancelBtn.addEventListener('click', function() {
+                cancelModal.style.display = 'none';
+            });
+            
+            // 确认中断按钮事件
+            confirmCancelBtn.addEventListener('click', function() {
+                cancelModal.style.display = 'none';
+                showToast('传输已中断');
+                setTimeout(function() {
+                    window.location.href = 'index.html';
+                }, 1000);
+            });
+            
+            // 显示提示信息的函数
+            function showToast(message) {
+                const toast = document.createElement('div');
+                toast.style.position = 'fixed';
+                toast.style.bottom = '100px';
+                toast.style.left = '50%';
+                toast.style.transform = 'translateX(-50%)';
+                toast.style.background = 'rgba(0, 0, 0, 0.8)';
+                toast.style.color = 'white';
+                toast.style.padding = '10px 20px';
+                toast.style.borderRadius = '30px';
+                toast.style.fontSize = '14px';
+                toast.style.fontWeight = '500';
+                toast.style.zIndex = '1000';
+                toast.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+                toast.textContent = message;
+                
+                document.body.appendChild(toast);
+                
+                setTimeout(function() {
+                    toast.style.opacity = '0';
+                    toast.style.transition = 'opacity 0.5s ease';
+                    
+                    setTimeout(function() {
+                        toast.remove();
+                    }, 500);
+                }, 2000);
+            }
+            
+            // 模拟进度条更新
+            let progress = 35;
+            const progressInterval = setInterval(function() {
+                progress += 1;
+                if (progress > 100) {
+                    clearInterval(progressInterval);
+                    showToast('所有文件传输完成');
+                    
+                    // 更新传输状态显示
+                    document.querySelector('.transfer-status span').textContent = '传输完成';
+                    document.querySelector('.status-dot').style.backgroundColor = 'var(--success-color)';
+                    document.querySelector('.status-dot').style.animation = 'none';
+                    document.querySelector('.transfer-text').textContent = '传输完成';
+                    document.querySelector('.transfer-icon i').className = 'fas fa-check-circle';
+                    
+                    // 隐藏数据粒子
+                    const particles = document.querySelectorAll('.data-particle');
+                    particles.forEach(particle => {
+                        particle.style.animation = 'none';
+                        particle.style.opacity = '0';
+                    });
+                    
+                    setTimeout(function() {
+                        window.location.href = 'index.html';
+                    }, 2000);
+                } else {
+                    progressBar.style.width = progress + '%';
+                    // 更新进度相关信息
+                    if (progress > 50) {
+                        document.querySelector('.time-remaining').textContent = '预计剩余：1分钟';
+                        document.querySelector('.transfer-text').textContent = '6.5 MB/s';
+                        document.querySelector('.transfer-stats div:last-child').textContent = '6.5 MB/s';
+                    }
+                    if (progress > 75) {
+                        document.querySelector('.time-remaining').textContent = '预计剩余：30秒';
+                        document.querySelector('.transfer-text').textContent = '7.8 MB/s';
+                        document.querySelector('.transfer-stats div:last-child').textContent = '7.8 MB/s';
+                    }
+                    // 更新已传输/总大小
+                    const totalSize = 702.1;
+                    const currentSize = (totalSize * progress / 100).toFixed(1);
+                    document.querySelector('.transfer-stats div:first-child').textContent = `${currentSize} MB / ${totalSize} MB`;
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html> 

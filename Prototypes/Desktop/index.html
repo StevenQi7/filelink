@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FileLink - 桌面端</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* 主页特定样式 */
+        .app-header {
+            text-align: center;
+            margin: 40px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .app-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(82, 113, 255, 0.3);
+        }
+        
+        .app-icon i {
+            font-size: 50px;
+            color: white;
+        }
+        
+        .app-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+        
+        .app-description {
+            font-size: 16px;
+            color: var(--text-secondary);
+            max-width: 500px;
+        }
+        
+        .main-actions {
+            display: flex;
+            gap: 30px;
+            margin: 50px auto;
+            max-width: 900px;
+        }
+        
+        .action-card {
+            flex: 1;
+            background-color: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-default);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            min-height: 380px;
+        }
+        
+        .action-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .action-header {
+            height: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .send-header {
+            background: linear-gradient(135deg, var(--primary-color), #7896ff);
+        }
+        
+        .receive-header {
+            background: linear-gradient(135deg, var(--success-color), #40e0b5);
+        }
+        
+        .action-icon {
+            position: relative;
+            z-index: 2;
+            font-size: 60px;
+            color: white;
+        }
+        
+        .action-pattern {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0.1;
+            background-image: radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.5) 0%, transparent 20%),
+                               radial-gradient(circle at 90% 80%, rgba(255, 255, 255, 0.5) 0%, transparent 20%),
+                               radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.3) 0%, transparent 40%);
+        }
+        
+        .action-content {
+            padding: 30px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .action-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .send-title {
+            color: var(--primary-color);
+        }
+        
+        .receive-title {
+            color: var(--success-color);
+        }
+        
+        .action-description {
+            font-size: 16px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 20px;
+            flex: 1;
+        }
+        
+        .action-steps {
+            margin-bottom: 20px;
+        }
+        
+        .step-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+        
+        .step-number {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+        
+        .send-number {
+            background-color: rgba(82, 113, 255, 0.1);
+            color: var(--primary-color);
+        }
+        
+        .receive-number {
+            background-color: rgba(0, 193, 154, 0.1);
+            color: var(--success-color);
+        }
+        
+        .step-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+            flex: 1;
+        }
+        
+        .action-button {
+            padding: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 8px;
+            text-align: center;
+            display: block;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+        }
+        
+        .send-button {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .send-button:hover {
+            background-color: #4560e0;
+        }
+        
+        .receive-button {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .receive-button:hover {
+            background-color: #00a583;
+        }
+        
+        .connection-status {
+            max-width: 900px;
+            margin: 0 auto 40px;
+            background-color: white;
+            box-shadow: var(--shadow-default);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--success-color);
+            margin-right: 15px;
+            position: relative;
+        }
+        
+        .status-indicator::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background-color: var(--success-color);
+            opacity: 0.4;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.4; }
+            50% { transform: scale(2.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 0; }
+        }
+        
+        .status-text {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        
+        .status-info {
+            margin-left: auto;
+            font-size: 14px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+        }
+        
+        .status-badge {
+            margin-left: 15px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            background-color: rgba(0, 193, 154, 0.1);
+            color: var(--success-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="desktop-container">
+        <!-- 侧边栏 -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <i class="fas fa-link"></i>
+                    FileLink
+                </div>
+            </div>
+            <div class="sidebar-content">
+                <ul class="sidebar-menu">
+                    <li class="sidebar-menu-item">
+                        <a href="#" class="sidebar-menu-link active">
+                            <i class="fas fa-home sidebar-menu-icon"></i>
+                            主页
+                        </a>
+                    </li>
+                    <li class="sidebar-menu-item">
+                        <a href="#" class="sidebar-menu-link">
+                            <i class="fas fa-paper-plane sidebar-menu-icon"></i>
+                            发送文件
+                        </a>
+                    </li>
+                    <li class="sidebar-menu-item">
+                        <a href="#" class="sidebar-menu-link">
+                            <i class="fas fa-download sidebar-menu-icon"></i>
+                            接收文件
+                        </a>
+                    </li>
+                    <li class="sidebar-menu-item">
+                        <a href="#" class="sidebar-menu-link">
+                            <i class="fas fa-history sidebar-menu-icon"></i>
+                            传输记录
+                        </a>
+                    </li>
+                    <li class="sidebar-menu-item">
+                        <a href="#" class="sidebar-menu-link">
+                            <i class="fas fa-cog sidebar-menu-icon"></i>
+                            设置
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div style="margin-left: 10px;">
+                        <div class="user-name">我的电脑</div>
+                        <div class="user-device">FileLink 桌面端</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 主内容区域 -->
+        <div class="main-content">
+            <div class="topbar">
+                <div class="page-title">FileLink</div>
+                <div class="topbar-actions">
+                    <button class="topbar-btn" title="更多选项">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="content-area">
+                <!-- 应用标题区域 -->
+                <div class="app-header">
+                    <div class="app-icon">
+                        <i class="fas fa-link"></i>
+                    </div>
+                    <h1 class="app-title">FileLink</h1>
+                    <p class="app-description">跨设备安全传输文件，无需中间服务器，快速可靠</p>
+                </div>
+                
+                <!-- 主要功能区域 -->
+                <div class="main-actions">
+                    <!-- 发送文件 -->
+                    <div class="action-card" id="sendCard">
+                        <div class="action-header send-header">
+                            <div class="action-pattern"></div>
+                            <div class="action-icon">
+                                <i class="fas fa-paper-plane"></i>
+                            </div>
+                        </div>
+                        <div class="action-content">
+                            <div class="action-title send-title">发送文件</div>
+                            <div class="action-description">
+                                选择本地文件或文件夹，通过局域网或公网安全发送到其他设备。无需登录账号，传输速度快，过程安全。
+                            </div>
+                            <div class="action-steps">
+                                <div class="step-item">
+                                    <div class="step-number send-number">1</div>
+                                    <div class="step-text">选择要发送的文件或文件夹</div>
+                                </div>
+                                <div class="step-item">
+                                    <div class="step-number send-number">2</div>
+                                    <div class="step-text">选择传输方式（局域网或公网）</div>
+                                </div>
+                                <div class="step-item">
+                                    <div class="step-number send-number">3</div>
+                                    <div class="step-text">等待接收方接收文件</div>
+                                </div>
+                            </div>
+                            <button class="action-button send-button" id="sendFileBtn">
+                                <i class="fas fa-paper-plane" style="margin-right: 8px;"></i>
+                                选择文件发送
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 接收文件 -->
+                    <div class="action-card" id="receiveCard">
+                        <div class="action-header receive-header">
+                            <div class="action-pattern"></div>
+                            <div class="action-icon">
+                                <i class="fas fa-download"></i>
+                            </div>
+                        </div>
+                        <div class="action-content">
+                            <div class="action-title receive-title">接收文件</div>
+                            <div class="action-description">
+                                从其他设备接收文件，支持局域网自动发现或通过密码接收。所有文件会直接保存到您的设备，传输过程加密安全。
+                            </div>
+                            <div class="action-steps">
+                                <div class="step-item">
+                                    <div class="step-number receive-number">1</div>
+                                    <div class="step-text">选择接收来源（局域网或输入密码）</div>
+                                </div>
+                                <div class="step-item">
+                                    <div class="step-number receive-number">2</div>
+                                    <div class="step-text">选择保存位置</div>
+                                </div>
+                                <div class="step-item">
+                                    <div class="step-number receive-number">3</div>
+                                    <div class="step-text">等待文件接收完成</div>
+                                </div>
+                            </div>
+                            <button class="action-button receive-button" id="receiveFileBtn">
+                                <i class="fas fa-download" style="margin-right: 8px;"></i>
+                                接收文件
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 连接状态 -->
+                <div class="connection-status">
+                    <div class="status-indicator"></div>
+                    <div class="status-text">FileLink 已启动并运行</div>
+                    <div class="status-info">
+                        <span>已连接到局域网</span>
+                        <span class="status-badge">在线</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 发送文件按钮点击事件
+            document.getElementById('sendFileBtn').addEventListener('click', function() {
+                window.location.href = 'send_file.html';
+            });
+            
+            document.getElementById('sendCard').addEventListener('click', function(e) {
+                if (!e.target.classList.contains('action-button')) {
+                    window.location.href = 'send_file.html';
+                }
+            });
+            
+            // 接收文件按钮点击事件
+            document.getElementById('receiveFileBtn').addEventListener('click', function() {
+                window.location.href = 'receive_file.html';
+            });
+            
+            document.getElementById('receiveCard').addEventListener('click', function(e) {
+                if (!e.target.classList.contains('action-button')) {
+                    window.location.href = 'receive_file.html';
+                }
+            });
+            
+            // 侧边栏菜单项点击事件
+            document.querySelectorAll('.sidebar-menu-link').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    // 阻止默认行为
+                    e.preventDefault();
+                    
+                    // 移除所有菜单项的active类
+                    document.querySelectorAll('.sidebar-menu-link').forEach(i => {
+                        i.classList.remove('active');
+                    });
+                    
+                    // 添加active类到当前点击的菜单项
+                    this.classList.add('active');
+                    
+                    // 获取菜单项文本并进行相应跳转
+                    const menuText = this.textContent.trim();
+                    if (menuText === '发送文件') {
+                        window.location.href = 'send_file.html';
+                    } else if (menuText === '接收文件') {
+                        window.location.href = 'receive_file.html';
+                    } else if (menuText === '主页') {
+                        window.location.href = 'index.html';
+                    } else {
+                        // 其他菜单项暂未实现，显示提示
+                        showToast(menuText + '功能开发中...');
+                    }
+                });
+            });
+            
+            // 显示提示信息的函数
+            function showToast(message) {
+                const toast = document.createElement('div');
+                toast.style.position = 'fixed';
+                toast.style.bottom = '30px';
+                toast.style.left = '50%';
+                toast.style.transform = 'translateX(-50%)';
+                toast.style.background = 'rgba(0, 0, 0, 0.8)';
+                toast.style.color = 'white';
+                toast.style.padding = '12px 24px';
+                toast.style.borderRadius = '6px';
+                toast.style.fontSize = '14px';
+                toast.style.fontWeight = '500';
+                toast.style.zIndex = '1000';
+                toast.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+                toast.textContent = message;
+                
+                document.body.appendChild(toast);
+                
+                setTimeout(function() {
+                    toast.style.opacity = '0';
+                    toast.style.transition = 'opacity 0.5s ease';
+                    
+                    setTimeout(function() {
+                        toast.remove();
+                    }, 500);
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FileLink - 密码生成</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* 密码生成页面样式 */
+        .code-generation-area {
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .page-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+        
+        .password-section {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-default);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .password-header {
+            margin-bottom: 30px;
+        }
+        
+        .password-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+        
+        .password-description {
+            font-size: 16px;
+            color: var(--text-secondary);
+            max-width: 600px;
+            line-height: 1.6;
+        }
+        
+        .password-display {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0;
+        }
+        
+        .password-digit {
+            width: 70px;
+            height: 90px;
+            background-color: var(--secondary-light);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 42px;
+            font-weight: 700;
+            color: var(--secondary-color);
+            margin: 0 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .password-digit::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.2), transparent);
+            pointer-events: none;
+        }
+        
+        .password-timer {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+        
+        .timer-value {
+            font-weight: 600;
+            color: var(--error-color);
+            margin: 0 5px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .cancel-btn {
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 500;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: white;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+        }
+        
+        .cancel-btn:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .cancel-btn i {
+            margin-right: 8px;
+        }
+        
+        .refresh-btn {
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 500;
+            border-radius: 8px;
+            border: none;
+            background-color: var(--secondary-color);
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+        }
+        
+        .refresh-btn:hover {
+            background-color: #6241D0;
+        }
+        
+        .refresh-btn i {
+            margin-right: 8px;
+        }
+        
+        .status-section {
+            margin-top: 30px;
+            padding: 30px;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-default);
+        }
+        
+        .status-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .status-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(0, 193, 154, 0.1);
+            color: var(--success-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-right: 15px;
+        }
+        
+        .status-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .status-progress {
+            margin-bottom: 30px;
+        }
+        
+        .progress-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .progress-status {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .status-complete {
+            background-color: rgba(0, 193, 154, 0.1);
+            color: var(--success-color);
+        }
+        
+        .status-pending {
+            background-color: rgba(255, 171, 0, 0.1);
+            color: var(--warning-color);
+        }
+        
+        .status-waiting {
+            background-color: var(--light-bg);
+            color: var(--text-tertiary);
+        }
+        
+        .progress-content {
+            flex: 1;
+        }
+        
+        .progress-title {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+        
+        .progress-description {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .file-info {
+            background-color: var(--light-bg);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .file-icon {
+            width: 40px;
+            height: 40px;
+            background-color: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: var(--primary-color);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            flex-shrink: 0;
+        }
+        
+        .file-details {
+            flex: 1;
+        }
+        
+        .file-count {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 3px;
+        }
+        
+        .file-size {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        /* 密码复制按钮 */
+        .copy-password-btn {
+            margin-top: 15px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 6px;
+            background-color: var(--light-bg);
+            border: none;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+        }
+        
+        .copy-password-btn:hover {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+        }
+        
+        .copy-password-btn i {
+            margin-right: 8px;
+        }
+        
+        /* 二维码显示 */
+        .qrcode-container {
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .qrcode-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+        }
+        
+        .qrcode {
+            width: 150px;
+            height: 150px;
+            background-color: white;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .qrcode img {
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* 连接线路标签 */
+        .connection-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 5px 10px;
+            background-color: rgba(0, 193, 154, 0.1);
+            color: var(--success-color);
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-left: 10px;
+        }
+        
+        .connection-badge i {
+            margin-right: 5px;
+            font-size: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="desktop-container">
+        <!-- 侧边栏 -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <i class="fas fa-link"></i>
+                    FileLink
+                </div>
+            </div>
+            <div class="sidebar-content">
+                <ul class="sidebar-menu">
+                    <li class="sidebar-menu-item">
+                        <a href="index.html" class="sidebar-menu-link">
+                            <i class="fas fa-home sidebar-menu-icon"></i>
+                            主页
+                        </a>
+                    </li>
+                    <li class="sidebar-menu-item">
+                        <a href="send_file.html" class="sidebar-menu-link active">
+                            <i class="fas fa-paper-plane sidebar-menu-icon"></i>
+                            发送文件
+                        </a>
+                    </li>
+                    <li class="sidebar-menu-item">
+                        <a href="receive_file.html" class="sidebar-menu-link">
+                            <i class="fas fa-download sidebar-menu-icon"></i>
+                            接收文件
+                        </a>
+                    </li>
+                    <li class="sidebar-menu-item">
+                        <a href="#" class="sidebar-menu-link">
+                            <i class="fas fa-history sidebar-menu-icon"></i>
+                            传输记录
+                        </a>
+                    </li>
+                    <li class="sidebar-menu-item">
+                        <a href="#" class="sidebar-menu-link">
+                            <i class="fas fa-cog sidebar-menu-icon"></i>
+                            设置
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div style="margin-left: 10px;">
+                        <div class="user-name">我的电脑</div>
+                        <div class="user-device">FileLink 桌面端</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 主内容区域 -->
+        <div class="main-content">
+            <div class="topbar">
+                <div class="page-title">公网传输</div>
+                <div class="topbar-actions">
+                    <button class="topbar-btn" title="更多选项">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="content-area">
+                <div class="code-generation-area">
+                    <div>
+                        <h2>公网传输密码</h2>
+                        <p class="page-subtitle">告知对方以下密码用于接收您的文件</p>
+                    </div>
+                    
+                    <!-- 密码显示区域 -->
+                    <div class="password-section">
+                        <div class="password-header">
+                            <h3 class="password-title">分享密码给接收方</h3>
+                            <p class="password-description">
+                                密码有效期为 15 分钟，请在有效期内让接收方在 FileLink 中输入以下 6 位数字密码来接收文件
+                            </p>
+                        </div>
+                        
+                        <div class="password-display">
+                            <div class="password-digit">5</div>
+                            <div class="password-digit">7</div>
+                            <div class="password-digit">2</div>
+                            <div class="password-digit">9</div>
+                            <div class="password-digit">3</div>
+                            <div class="password-digit">0</div>
+                        </div>
+                        
+                        <div class="password-timer">
+                            密码有效时间剩余：<span class="timer-value" id="timer">14:55</span>
+                        </div>
+                        
+                        <button class="copy-password-btn" id="copyBtn">
+                            <i class="fas fa-copy"></i>
+                            复制密码
+                        </button>
+                        
+                        <div class="qrcode-container">
+                            <div class="qrcode-title">或扫描二维码接收</div>
+                            <div class="qrcode">
+                                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJQAAACUCAYAAAB1PADUAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAULSURBVHhe7ZJRjuQgDEN7/0vvR7VSJDuOgQQWu5+EZtrGNjx+fkjiBFQSOQGVRE5AJZETUEnkBFQSOQGVRE5AJZETUEnkBFQSOQGVRE5AJZETUEnkBFQSOQGVRE5AJZETUEnkBFQSOQGVRE5AJZETUEnkBFQSOQGVRE5AJZETUEnkBFQSOQGVRE5AJZETUEnkvID6+fn56T+nI7n2rnPaMTfr7Tnd7k4e1gLlZuQ8hVdH42bdck53e1KHpUBpM3L+hVXHY+eseUJvU3l1F3JeQcjx0DlrntKdpB9k13neUwQ5Hjpn3VN6k7ODrDrPe4ogxwOrnnpv9QYDmbNk1XneUwQ5HrDqqfe2bk+QMUdWnec9RZDjAaue69a6uUG2EVl1nvcUQY4HrHquW+vmBtlGZNV53lMEOR6w6rlurZsbZBuRVeetkf2f9Cfn/8iq8xpk/Iact/DqqD9r7q0SZFoj+3XkvIVXR/1Zc2+VINMa2e8g4y28uqvPuvsLZFkj+3XkvIVXd/VZd3+BLGtkv46ct/DqVmetXZmQYY3s15HzFl7d6qy1KxMyrJH9OnLewqtbnbV2ZUKGNbL/QMY7eHXXz+pzL6sE+x9kf0TOO3h1188aey+rBPsfZL+DjHfw6q6fNfZeVgn2P8h+Bxnv4NVdP2vsvawS7H+Q/Q4y3sGru37W2HtZJdjfIvNfZL2FV3ftrLGrBPtbZP6DrHeQcYRXf+WseTcJ9rfI/BdZ7yDjCK/+ylnzbhLsb5H5L7I+Qqt7y1ljbx/B/haZ/yLrI7S6t5w19vYR7J8g+11kHaHVveWssfcI/RNkv4usI7S6t5w19h6hf4Lsd5F1hFY3Ys9MoH+C7HeR9RFa3Yg98wi9l+W3EPMRWt2IPfMIvZfltxDzEVrdiD3zCL2X5bcQ8xFa3Yg98wi9l+W3EPMttNqIM/cRei/LbyHmW2i1EWfuI/Relt9CzLfQaiPO3CfIeQrRn6LVrrDnrpFtC/XeQvSnaLUr7LlrZNtCvbcQ/Sla7Qp77hrZtlDvLUR/ila7wp57C1m3UPMpWu0Ka+YW+W6h5lOIXqHVr7BmbpHvFmo+hegVWv0Ka+YW+W6h5lOIXqHVr7Bm3kLmLdRcoe2oMOZtkfEW6q3QdlQY87bIeAv1Vmg7Kox5t9D7Fuqt0HZUGPNuobeFeiu0HRXGPAXZN9DrCm1HxZmnIPsGel2h7ag48xRk30CvK7QdFWeeQscN9FrR+1T0Pgqyb6DXit6novcpyL6BXit6n4rep9BxA71W9D4VvU9B9g30WtH7VPQ+hY4b6LWi96nofQodN9BrRe9T0fsUOm6gF6H3Ur+h94mQ8Q3rkXbW7+h9ImR8w3qknfU7ep8IGd+wHmln/Y7eJ0LGGdYT7arfofsJkG+G9US76nfofgLkm2E90a76HbqfAPlmWE+0q36H7idAvhnWE+2qX6H7AeR7nrOeaHX9Ct0PIHvNOtRKu+tX6H4A2WvW2Vbaab9C9wPIXrPOttJO+wzdR+j9Gmqt/oN+A7ofQfa39KPttt+g+xFkf0s/2m77DbofQfa39KPttt+g+xFkf0s/2m77DbofQfa39Hvaar9B9wNk/0Dvpd5bPYLuB8j+Br2XWlPtLXQ/QPY36L3Ummr/Q/cDZH+D3kutqfY/dD9A9jfovdSaav9D9wPI/pZ+tN32jVSRwgmoJHICKomcgEoiJ6CSyAmoJHICKomcgEoiJ6CSyAmoJHICKomcgEoiJ6CSyAmoJGr+/v4DOqVMHR8cDXAAAAAASUVORK5CYII=" alt="QR Code for connecting">
+                            </div>
+                        </div>
+                        
+                        <div class="action-buttons">
+                            <button class="cancel-btn" id="cancelBtn">
+                                <i class="fas fa-times"></i>
+                                取消传输
+                            </button>
+                            <button class="refresh-btn" id="refreshBtn">
+                                <i class="fas fa-sync-alt"></i>
+                                刷新密码
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 传输状态区域 -->
+                    <div class="status-section">
+                        <div class="status-header">
+                            <div class="status-icon">
+                                <i class="fas fa-signal"></i>
+                            </div>
+                            <div class="status-title">
+                                传输状态
+                                <span class="connection-badge">
+                                    <i class="fas fa-circle"></i>
+                                    高速线路
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="status-progress">
+                            <div class="progress-item">
+                                <div class="progress-status status-complete">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <div class="progress-content">
+                                    <div class="progress-title">已创建连接通道</div>
+                                    <div class="progress-description">公网传输连接已成功创建</div>
+                                </div>
+                            </div>
+                            
+                            <div class="progress-item">
+                                <div class="progress-status status-complete">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <div class="progress-content">
+                                    <div class="progress-title">已生成连接密码</div>
+                                    <div class="progress-description">密码已生成，有效期为15分钟</div>
+                                </div>
+                            </div>
+                            
+                            <div class="progress-item">
+                                <div class="progress-status status-pending">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="progress-content">
+                                    <div class="progress-title">等待接收方连接</div>
+                                    <div class="progress-description">请让接收方输入6位密码</div>
+                                </div>
+                            </div>
+                            
+                            <div class="progress-item">
+                                <div class="progress-status status-waiting">
+                                    <i class="fas fa-spinner"></i>
+                                </div>
+                                <div class="progress-content">
+                                    <div class="progress-title">开始传输文件</div>
+                                    <div class="progress-description">等待接收方连接后开始传输</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="file-info">
+                            <div class="file-icon">
+                                <i class="fas fa-file"></i>
+                            </div>
+                            <div class="file-details">
+                                <div class="file-count">已准备 5 个文件</div>
+                                <div class="file-size">总大小: 38.2 MB</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const copyBtn = document.getElementById('copyBtn');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const refreshBtn = document.getElementById('refreshBtn');
+            const timerElement = document.getElementById('timer');
+            
+            // 模拟计时器
+            let minutes = 14;
+            let seconds = 55;
+            
+            const timerInterval = setInterval(function() {
+                seconds--;
+                
+                if (seconds < 0) {
+                    seconds = 59;
+                    minutes--;
+                }
+                
+                if (minutes < 0) {
+                    clearInterval(timerInterval);
+                    showToast('密码已过期，请刷新生成新密码');
+                    return;
+                }
+                
+                // 更新计时器显示
+                timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+            
+            // 复制密码按钮点击事件
+            copyBtn.addEventListener('click', function() {
+                const password = Array.from(document.querySelectorAll('.password-digit'))
+                    .map(digit => digit.textContent)
+                    .join('');
+                
+                // 复制到剪贴板
+                navigator.clipboard.writeText(password)
+                    .then(() => {
+                        showToast('密码已复制到剪贴板');
+                    })
+                    .catch(err => {
+                        showToast('复制失败，请手动复制');
+                        console.error('无法复制: ', err);
+                    });
+            });
+            
+            // 取消传输按钮点击事件
+            cancelBtn.addEventListener('click', function() {
+                if (confirm('确定要取消此次传输吗？')) {
+                    clearInterval(timerInterval);
+                    window.location.href = 'send_file.html';
+                }
+            });
+            
+            // 刷新密码按钮点击事件
+            refreshBtn.addEventListener('click', function() {
+                // 生成新的随机密码
+                const digits = document.querySelectorAll('.password-digit');
+                digits.forEach(digit => {
+                    digit.textContent = Math.floor(Math.random() * 10);
+                });
+                
+                // 重置计时器
+                clearInterval(timerInterval);
+                minutes = 14;
+                seconds = 59;
+                timerElement.textContent = '14:59';
+                
+                // 重新开始计时
+                setInterval(function() {
+                    seconds--;
+                    
+                    if (seconds < 0) {
+                        seconds = 59;
+                        minutes--;
+                    }
+                    
+                    if (minutes < 0) {
+                        clearInterval(timerInterval);
+                        showToast('密码已过期，请刷新生成新密码');
+                        return;
+                    }
+                    
+                    // 更新计时器显示
+                    timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                }, 1000);
+                
+                showToast('已生成新密码，有效期为15分钟');
+            });
+            
+            // 显示提示信息的函数
+            function showToast(message) {
+                const toast = document.createElement('div');
+                toast.style.position = 'fixed';
+                toast.style.bottom = '30px';
+                toast.style.left = '50%';
+                toast.style.transform = 'translateX(-50%)';
+                toast.style.background = 'rgba(0, 0, 0, 0.8)';
+                toast.style.color = 'white';
+                toast.style.padding = '12px 24px';
+                toast.style.borderRadius = '6px';
+                toast.style.fontSize = '14px';
+                toast.style.fontWeight = '500';
+                toast.style.zIndex = '1000';
+                toast.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+                toast.textContent = message;
+                
+                document.body.appendChild(toast);
+                
+                setTimeout(function() {
+                    toast.style.opacity = '0';
+                    toast.style.transition = 'opacity 0.5s ease';
+                    
+                    setTimeout(function() {
+                        toast.remove();
+                    }, 500);
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FileLink - 选择传输方式</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* 传输方式选择页面样式 */
+        .send-method-area {
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .page-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+        
+        .selected-files-summary {
+            background-color: var(--light-bg);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 30px;
+        }
+        
+        .summary-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .summary-title i {
+            margin-right: 8px;
+            color: var(--text-secondary);
+        }
+        
+        .file-summary {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+        
+        .file-count-badge {
+            display: flex;
+            align-items: center;
+            padding: 6px 12px;
+            background-color: white;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            margin-right: 15px;
+        }
+        
+        .file-count-badge i {
+            margin-right: 6px;
+            color: var(--primary-color);
+        }
+        
+        .file-size-badge {
+            display: flex;
+            align-items: center;
+            padding: 6px 12px;
+            background-color: white;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .file-size-badge i {
+            margin-right: 6px;
+            color: var(--success-color);
+        }
+        
+        .methods-container {
+            display: flex;
+            gap: 30px;
+            min-height: 400px;
+        }
+        
+        .method-card {
+            flex: 1;
+            background-color: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-default);
+            display: flex;
+            flex-direction: column;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .method-card:hover {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transform: translateY(-5px);
+        }
+        
+        .method-card.selected {
+            border-color: var(--primary-color);
+            box-shadow: 0 10px 30px rgba(82, 113, 255, 0.15);
+        }
+        
+        .method-header {
+            padding: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .method-title-container {
+            display: flex;
+            align-items: center;
+        }
+        
+        .method-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .lan-icon {
+            background-color: rgba(82, 113, 255, 0.1);
+            color: var(--primary-color);
+        }
+        
+        .inet-icon {
+            background-color: rgba(115, 83, 229, 0.1);
+            color: var(--secondary-color);
+        }
+        
+        .method-icon i {
+            font-size: 24px;
+        }
+        
+        .method-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .method-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .method-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .lan-badge {
+            background-color: rgba(82, 113, 255, 0.1);
+            color: var(--primary-color);
+        }
+        
+        .inet-badge {
+            background-color: rgba(115, 83, 229, 0.1);
+            color: var(--secondary-color);
+        }
+        
+        .method-content {
+            padding: 25px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .method-description {
+            font-size: 15px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+            flex: 1;
+            margin-bottom: 25px;
+        }
+        
+        .method-features {
+            margin-bottom: 25px;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+        
+        .feature-icon {
+            margin-right: 10px;
+            color: var(--success-color);
+            flex-shrink: 0;
+        }
+        
+        .feature-text {
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+        
+        .warning-text {
+            color: var(--warning-color);
+        }
+        
+        .method-action-button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .method-action-button i {
+            margin-right: 8px;
+        }
+        
+        .lan-button {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .lan-button:hover {
+            background-color: #4560e0;
+        }
+        
+        .inet-button {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .inet-button:hover {
+            background-color: #6241D0;
+        }
+        
+        .comparison-section {
+            margin-top: 20px;
+            background-color: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-default);
+        }
+        
+        .comparison-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .comparison-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .comparison-table th, .comparison-table td {
+            padding: 15px 25px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .comparison-table th {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            background-color: var(--light-bg);
+        }
+        
+        .comparison-table td {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .comparison-highlight {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .method-col {
+            width: 180px;
+        }
+        
+        /* 响应式样式 */
+        @media (max-width: 1024px) {
+            .methods-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="desktop-container">
+        <!-- 侧边栏 -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <i class="fas fa-link"></i>
+                    FileLink
+                </div>
+            </div>
+            <div class="sidebar-content">
+                <ul class="sidebar-menu">
+                    <li class="sidebar-menu-item">
+                        <a href="index.html" class="sidebar-menu-link">
+                            <i class="fas fa-home sidebar-menu-icon"></i>
+                            主页
+                        </a>
+                    </li>
+                    <li class="sidebar-menu-item">
+                        <a href="send_file.html" class="sidebar-menu-link active">
+                            <i class="fas fa-paper-plane sidebar-menu-icon"></i>
+                            发送文件
+                        </a>
+                    </li>
+                    <li class="sidebar-menu-item">
+                        <a href="receive_file.html" class="sidebar-menu-link">
+                            <i class="fas fa-download sidebar-menu-icon"></i>
+                            接收文件
+                        </a>
+                    </li>
+                    <li class="sidebar-menu-item">
+                        <a href="#" class="sidebar-menu-link">
+                            <i class="fas fa-history sidebar-menu-icon"></i>
+                            传输记录
+                        </a>
+                    </li>
+                    <li class="sidebar-menu-item">
+                        <a href="#" class="sidebar-menu-link">
+                            <i class="fas fa-cog sidebar-menu-icon"></i>
+                            设置
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div style="margin-left: 10px;">
+                        <div class="user-name">我的电脑</div>
+                        <div class="user-device">FileLink 桌面端</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 主内容区域 -->
+        <div class="main-content">
+            <div class="topbar">
+                <div class="page-title">选择传输方式</div>
+                <div class="topbar-actions">
+                    <button class="topbar-btn" title="更多选项">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="content-area">
+                <div class="send-method-area">
+                    <div>
+                        <h2>选择发送方式</h2>
+                        <p class="page-subtitle">请选择您要使用的传输方式，不同的方式适用于不同的场景</p>
+                    </div>
+                    
+                    <!-- 已选文件概要 -->
+                    <div class="selected-files-summary">
+                        <div class="summary-title">
+                            <i class="fas fa-file-alt"></i>
+                            已选择的文件
+                        </div>
+                        <div class="file-summary">
+                            <div class="file-count-badge">
+                                <i class="fas fa-file"></i>
+                                <span id="fileCountBadge">5个文件</span>
+                            </div>
+                            <div class="file-size-badge">
+                                <i class="fas fa-database"></i>
+                                <span id="fileSizeBadge">38.2 MB</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 传输方式选择 -->
+                    <div class="methods-container">
+                        <!-- 局域网传输 -->
+                        <div class="method-card selected" id="lanMethodCard">
+                            <div class="method-header">
+                                <div class="method-title-container">
+                                    <div class="method-icon lan-icon">
+                                        <i class="fas fa-wifi"></i>
+                                    </div>
+                                    <div>
+                                        <div class="method-title">局域网传输</div>
+                                        <div class="method-subtitle">通过本地网络传输</div>
+                                    </div>
+                                </div>
+                                <div class="method-badge lan-badge">高速 & 安全</div>
+                            </div>
+                            <div class="method-content">
+                                <div class="method-description">
+                                    使用局域网传输可以获得最快的传输速度，适合在同一网络下（如家庭或办公室WiFi）的设备之间传输文件。它不依赖互联网，传输过程更加安全可靠。
+                                </div>
+                                <div class="method-features">
+                                    <div class="feature-item">
+                                        <i class="fas fa-check-circle feature-icon"></i>
+                                        <div class="feature-text">通过本地网络高速传输，速度最快</div>
+                                    </div>
+                                    <div class="feature-item">
+                                        <i class="fas fa-check-circle feature-icon"></i>
+                                        <div class="feature-text">无需互联网连接，更加安全可靠</div>
+                                    </div>
+                                    <div class="feature-item">
+                                        <i class="fas fa-check-circle feature-icon"></i>
+                                        <div class="feature-text">自动发现同一网络下的设备</div>
+                                    </div>
+                                    <div class="feature-item">
+                                        <i class="fas fa-exclamation-circle feature-icon" style="color: var(--warning-color);"></i>
+                                        <div class="feature-text warning-text">要求发送方和接收方在同一网络下</div>
+                                    </div>
+                                </div>
+                                <button class="method-action-button lan-button" id="lanButton">
+                                    <i class="fas fa-search"></i>
+                                    搜索设备
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- 公网传输 -->
+                        <div class="method-card" id="inetMethodCard">
+                            <div class="method-header">
+                                <div class="method-title-container">
+                                    <div class="method-icon inet-icon">
+                                        <i class="fas fa-globe"></i>
+                                    </div>
+                                    <div>
+                                        <div class="method-title">公网传输</div>
+                                        <div class="method-subtitle">通过互联网传输</div>
+                                    </div>
+                                </div>
+                                <div class="method-badge inet-badge">随时随地</div>
+                            </div>
+                            <div class="method-content">
+                                <div class="method-description">
+                                    使用公网传输可以在任何地方、任何网络环境下传输文件，适合发送方和接收方不在同一网络下的情况。通过生成密码，接收方可以在任何地方安全地接收文件。
+                                </div>
+                                <div class="method-features">
+                                    <div class="feature-item">
+                                        <i class="fas fa-check-circle feature-icon"></i>
+                                        <div class="feature-text">不受网络限制，可跨网络传输</div>
+                                    </div>
+                                    <div class="feature-item">
+                                        <i class="fas fa-check-circle feature-icon"></i>
+                                        <div class="feature-text">生成密码保护，确保安全传输</div>
+                                    </div>
+                                    <div class="feature-item">
+                                        <i class="fas fa-check-circle feature-icon"></i>
+                                        <div class="feature-text">适合远程工作或异地传输场景</div>
+                                    </div>
+                                    <div class="feature-item">
+                                        <i class="fas fa-exclamation-circle feature-icon" style="color: var(--warning-color);"></i>
+                                        <div class="feature-text warning-text">传输速度受互联网带宽限制</div>
+                                    </div>
+                                </div>
+                                <button class="method-action-button inet-button" id="inetButton">
+                                    <i class="fas fa-key"></i>
+                                    创建密码
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 传输方式比较 -->
+                    <div class="comparison-section">
+                        <div class="comparison-header">
+                            <div class="comparison-title">传输方式比较</div>
+                        </div>
+                        <table class="comparison-table">
+                            <thead>
+                                <tr>
+                                    <th>特性</th>
+                                    <th class="method-col">局域网传输</th>
+                                    <th class="method-col">公网传输</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>传输速度</td>
+                                    <td class="comparison-highlight">10-100MB/s</td>
+                                    <td>1-10MB/s</td>
+                                </tr>
+                                <tr>
+                                    <td>传输距离</td>
+                                    <td>同一局域网</td>
+                                    <td class="comparison-highlight">无限制</td>
+                                </tr>
+                                <tr>
+                                    <td>安全性</td>
+                                    <td class="comparison-highlight">本地加密传输</td>
+                                    <td>端到端加密 + 密码保护</td>
+                                </tr>
+                                <tr>
+                                    <td>设备发现</td>
+                                    <td class="comparison-highlight">自动发现</td>
+                                    <td>通过密码连接</td>
+                                </tr>
+                                <tr>
+                                    <td>适用场景</td>
+                                    <td>办公室、家庭内部</td>
+                                    <td class="comparison-highlight">远程工作、异地传输</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const lanMethodCard = document.getElementById('lanMethodCard');
+            const inetMethodCard = document.getElementById('inetMethodCard');
+            const lanButton = document.getElementById('lanButton');
+            const inetButton = document.getElementById('inetButton');
+            
+            // 模拟数据
+            const fileCount = 5;
+            const totalSize = '38.2 MB';
+            
+            // 更新文件统计
+            document.getElementById('fileCountBadge').textContent = fileCount + '个文件';
+            document.getElementById('fileSizeBadge').textContent = totalSize;
+            
+            // 局域网卡片点击事件
+            lanMethodCard.addEventListener('click', function() {
+                lanMethodCard.classList.add('selected');
+                inetMethodCard.classList.remove('selected');
+            });
+            
+            // 公网卡片点击事件
+            inetMethodCard.addEventListener('click', function() {
+                inetMethodCard.classList.add('selected');
+                lanMethodCard.classList.remove('selected');
+            });
+            
+            // 局域网按钮点击事件
+            lanButton.addEventListener('click', function() {
+                // 跳转到设备发现页面
+                window.location.href = 'discovery.html';
+            });
+            
+            // 公网按钮点击事件
+            inetButton.addEventListener('click', function() {
+                // 跳转到公网传输页面
+                window.location.href = 'inet_code.html';
+            });
+            
+            // 设置活跃的侧边栏菜单项
+            const menuItems = document.querySelectorAll('.sidebar-menu-link');
+            menuItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.querySelector('.sidebar-menu-icon').classList.contains('fa-paper-plane')) {
+                    item.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

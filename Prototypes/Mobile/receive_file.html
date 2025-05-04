@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FileLink - 接收文件</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/modern.css">
+    <style>
+        .tab-box {
+            display: flex;
+            margin-bottom: var(--spacing-lg);
+            border-radius: var(--border-radius-full);
+            background-color: var(--bg-color);
+            padding: 6px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            text-align: center;
+            padding: var(--spacing-sm) 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            position: relative;
+            z-index: 2;
+            transition: color var(--transition-fast);
+            border-radius: var(--border-radius-full);
+        }
+        
+        .tab-btn.active {
+            color: white;
+        }
+        
+        .tab-selector {
+            position: absolute;
+            height: calc(100% - 12px);
+            width: calc(50% - 6px);
+            background: var(--primary-gradient);
+            top: 6px;
+            left: 6px;
+            border-radius: var(--border-radius-full);
+            transition: transform var(--transition-normal);
+            z-index: 1;
+        }
+        
+        .scan-container {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            margin: 0 auto var(--spacing-xl);
+            overflow: hidden;
+            border-radius: var(--border-radius-md);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .scanner-bg {
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.05);
+            position: relative;
+        }
+        
+        .scan-animation {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+            box-shadow: 0 0 10px var(--primary-color);
+            animation: scan 2.5s infinite ease-in-out;
+        }
+        
+        @keyframes scan {
+            0%, 100% { top: 0; opacity: 0.8; }
+            50% { top: calc(100% - 2px); opacity: 1; }
+        }
+        
+        .scan-corners {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .scan-corner {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            border-color: var(--primary-color);
+            border-style: solid;
+            box-shadow: 0 0 0 1px rgba(71, 118, 230, 0.1);
+        }
+        
+        .top-left {
+            top: 16px;
+            left: 16px;
+            border-width: 3px 0 0 3px;
+            border-radius: 8px 0 0 0;
+        }
+        
+        .top-right {
+            top: 16px;
+            right: 16px;
+            border-width: 3px 3px 0 0;
+            border-radius: 0 8px 0 0;
+        }
+        
+        .bottom-left {
+            bottom: 16px;
+            left: 16px;
+            border-width: 0 0 3px 3px;
+            border-radius: 0 0 0 8px;
+        }
+        
+        .bottom-right {
+            bottom: 16px;
+            right: 16px;
+            border-width: 0 3px 3px 0;
+            border-radius: 0 0 8px 0;
+        }
+        
+        .info-pill {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            background-color: var(--bg-color);
+            color: var(--text-secondary);
+            font-size: 14px;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--border-radius-full);
+            width: fit-content;
+            margin: 0 auto var(--spacing-lg);
+        }
+        
+        /* 输入框增强样式 */
+        .code-input-box {
+            position: relative;
+            margin: var(--spacing-lg) 0 var(--spacing-xl);
+        }
+        
+        .digit-input {
+            font-family: monospace;
+            font-size: 24px;
+            caret-color: var(--primary-color);
+        }
+        
+        .digit-input:not(:placeholder-shown) {
+            border-color: var(--primary-color);
+            background-color: rgba(71, 118, 230, 0.05);
+        }
+        
+        .code-helper-text {
+            text-align: center;
+            margin-bottom: var(--spacing-lg);
+            font-size: 15px;
+            color: var(--text-secondary);
+        }
+        
+        /* 扫描参考区 */
+        .scan-reference {
+            margin-top: var(--spacing-xl);
+            padding: var(--spacing-md);
+            background-color: var(--bg-color);
+            border-radius: var(--border-radius-md);
+            text-align: center;
+        }
+        
+        .reference-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: var(--spacing-sm);
+            color: var(--text-primary);
+        }
+        
+        .reference-image {
+            width: 140px;
+            margin: 0 auto var(--spacing-sm);
+            border-radius: var(--border-radius-sm);
+            border: var(--border-width) solid var(--border-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="iphone-frame">
+        <!-- 状态栏 -->
+        <div class="status-bar">
+            <span>9:41</span>
+            <div>
+                <i class="fas fa-signal"></i>
+                <i class="fas fa-wifi"></i>
+                <i class="fas fa-battery-full"></i>
+            </div>
+        </div>
+
+        <!-- 主内容区域 -->
+        <div class="app-content">
+            <div class="content-wrapper">
+                <div class="navbar">
+                    <div class="btn-icon" id="backButton">
+                        <i class="fas fa-arrow-left"></i>
+                    </div>
+                    <div class="navbar-title">接收文件</div>
+                    <div style="width: 40px;"></div> <!-- 占位 -->
+                </div>
+                
+                <div class="container">
+                    <!-- 切换选项卡 -->
+                    <div class="tab-box">
+                        <div class="tab-selector" id="tabSelector"></div>
+                        <div class="tab-btn active" data-tab="code-tab">输入密码</div>
+                        <div class="tab-btn" data-tab="scan-tab">扫描二维码</div>
+                    </div>
+                    
+                    <!-- 输入密码选项卡 -->
+                    <div class="tab-content active" id="code-tab">
+                        <div class="card" style="text-align: center; padding: var(--spacing-xl) var(--spacing-lg);">
+                            <h3 style="font-size: 18px; margin-bottom: var(--spacing-md);">输入连接密码</h3>
+                            <p class="code-helper-text">请向发送方索取6位连接密码</p>
+                            
+                            <div class="code-input-box">
+                                <input type="text" maxlength="1" class="digit-input" data-index="1" placeholder="">
+                                <input type="text" maxlength="1" class="digit-input" data-index="2" placeholder="">
+                                <input type="text" maxlength="1" class="digit-input" data-index="3" placeholder="">
+                                <input type="text" maxlength="1" class="digit-input" data-index="4" placeholder="">
+                                <input type="text" maxlength="1" class="digit-input" data-index="5" placeholder="">
+                                <input type="text" maxlength="1" class="digit-input" data-index="6" placeholder="">
+                            </div>
+                            
+                            <button class="btn w-full" id="connectCodeBtn">
+                                <i class="fas fa-link" style="margin-right: var(--spacing-sm);"></i>
+                                连接
+                            </button>
+                        </div>
+                        
+                        <!-- 说明卡片 -->
+                        <div class="card" style="margin-top: var(--spacing-xl);">
+                            <h3 style="font-size: 16px; margin-bottom: var(--spacing-md);">如何获取密码？</h3>
+                            
+                            <div class="flex items-center gap-md" style="margin-bottom: var(--spacing-md);">
+                                <div class="icon-container" style="min-width: 40px; background-color: rgba(71, 118, 230, 0.05);">
+                                    <i class="fas fa-info-circle"></i>
+                                </div>
+                                <p style="margin-bottom: 0; font-size: 14px;">请向发送方获取由FileLink生成的6位密码</p>
+                            </div>
+                            
+                            <div class="flex items-center gap-md">
+                                <div class="icon-container" style="min-width: 40px; background-color: rgba(246, 173, 85, 0.05); color: var(--warning-color);">
+                                    <i class="fas fa-lightbulb"></i>
+                                </div>
+                                <p style="margin-bottom: 0; font-size: 14px;">发送方可通过复制或分享方式将密码发送给您</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 扫描二维码选项卡 -->
+                    <div class="tab-content" id="scan-tab">
+                        <div class="scan-container">
+                            <div class="scanner-bg">
+                                <div class="scan-animation"></div>
+                                <div class="scan-corners">
+                                    <div class="scan-corner top-left"></div>
+                                    <div class="scan-corner top-right"></div>
+                                    <div class="scan-corner bottom-left"></div>
+                                    <div class="scan-corner bottom-right"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-pill">
+                            <i class="fas fa-info-circle"></i>
+                            <span>将二维码对准扫描框，自动识别</span>
+                        </div>
+                        
+                        <div class="flex justify-center">
+                            <button class="btn btn-secondary" id="toggleCameraBtn">
+                                <i class="fas fa-camera-rotate" style="margin-right: var(--spacing-sm);"></i>
+                                切换摄像头
+                            </button>
+                        </div>
+                        
+                        <!-- 扫描说明 -->
+                        <div class="scan-reference">
+                            <div class="reference-title">参考示例</div>
+                            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYAAACWAQMAAAAGz+OhAAAABlBMVEX///8AAABVwtN+AAABYElEQVRIie2WMY7DMAxEKaBIn0M30UE4dMnBfRIZcJEiR5EB+xr2TWTAJ1lS0nGaIl2LAkOMxXhAjR4pikb6/LQ+OD0Cugc05ZiaUk6p4ZoVc9bMQbNAWvhN/TezhlnLDMwy8xfOCLNXZhUb6ZjVaEvMas1Ws+2ZvcyeZk+YnZlx5wIzFZhRYbbiJy3+0orvXPE7Ka5JcWWKryXhaxG+H/BdAu4TwB0DuHsA9xPgTgPcfW4VUlF1jE9GfJbi8xWf+Pi+YB0q1qRizazLrM+Md3vj5uDmomgb7j5kkSK7tS61m2oXrSitc0i7mXaTdjNZ5w3bF+8L7AvuK+4L9wX3lVQGUmGMVBqmUi2pWHukckmpYJOGTnFXMnc9cTc1d/1zLwruevNeEO9VwXt5eK8S75XzXknea8t7tXmvP77jwHcw+K4I31niO098N43vvvFdQb6bKWpXIbuvfLdXFKIPzjNjEu5TpfIAAAAASUVORK5CYII=" class="reference-image">
+                            <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 0;">发送方在FileLink中生成的二维码应类似上图</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 底部导航条 -->
+            <div class="bottom-nav-bar">
+                <div class="bottom-line"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const backButton = document.getElementById('backButton');
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            const tabSelector = document.getElementById('tabSelector');
+            const digitInputs = document.querySelectorAll('.digit-input');
+            const connectCodeBtn = document.getElementById('connectCodeBtn');
+            const toggleCameraBtn = document.getElementById('toggleCameraBtn');
+            
+            // 返回按钮点击事件
+            backButton.addEventListener('click', function() {
+                window.location.href = 'index.html';
+            });
+            
+            // 标签页切换
+            tabBtns.forEach((btn, index) => {
+                btn.addEventListener('click', function() {
+                    // 更新选择器位置
+                    if (index === 0) {
+                        tabSelector.style.transform = 'translateX(0)';
+                    } else {
+                        tabSelector.style.transform = 'translateX(100%)';
+                    }
+                    
+                    // 更新激活状态
+                    tabBtns.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // 切换内容
+                    const tabId = this.getAttribute('data-tab');
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+            
+            // 密码输入框焦点控制
+            digitInputs.forEach((input, index) => {
+                // 只允许输入数字
+                input.addEventListener('input', function(e) {
+                    this.value = this.value.replace(/\D/g, '');
+                    
+                    // 如果输入了内容且不是最后一个输入框，则自动跳转到下一个
+                    if (this.value.length === 1 && index < digitInputs.length - 1) {
+                        digitInputs[index + 1].focus();
+                    }
+                    
+                    // 检查是否所有框都已填写
+                    checkInputCompletion();
+                });
+                
+                // 处理退格键
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Backspace' && this.value.length === 0 && index > 0) {
+                        digitInputs[index - 1].focus();
+                    }
+                });
+            });
+            
+            // 连接按钮点击事件
+            connectCodeBtn.addEventListener('click', function() {
+                // 收集所有输入的数字
+                let code = '';
+                let isComplete = true;
+                
+                digitInputs.forEach(input => {
+                    if (input.value.length === 0) {
+                        isComplete = false;
+                    }
+                    code += input.value;
+                });
+                
+                if (isComplete) {
+                    // 模拟验证成功
+                    window.location.href = 'transfer_progress.html';
+                } else {
+                    // 提示用户填写完整
+                    showToast('请输入完整的6位密码');
+                }
+            });
+            
+            // 切换摄像头按钮事件
+            toggleCameraBtn.addEventListener('click', function() {
+                // 模拟切换摄像头
+                showToast('已切换到前置摄像头');
+            });
+            
+            // 显示提示信息的函数
+            function showToast(message) {
+                const toast = document.createElement('div');
+                toast.style.position = 'fixed';
+                toast.style.bottom = '100px';
+                toast.style.left = '50%';
+                toast.style.transform = 'translateX(-50%)';
+                toast.style.background = 'rgba(0, 0, 0, 0.8)';
+                toast.style.color = 'white';
+                toast.style.padding = '10px 20px';
+                toast.style.borderRadius = '30px';
+                toast.style.fontSize = '14px';
+                toast.style.fontWeight = '500';
+                toast.style.zIndex = '1000';
+                toast.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+                toast.textContent = message;
+                
+                document.body.appendChild(toast);
+                
+                setTimeout(function() {
+                    toast.style.opacity = '0';
+                    toast.style.transition = 'opacity 0.5s ease';
+                    
+                    setTimeout(function() {
+                        toast.remove();
+                    }, 500);
+                }, 2000);
+            }
+            
+            // 检查输入是否完成，更新按钮样式
+            function checkInputCompletion() {
+                let isComplete = true;
+                
+                digitInputs.forEach(input => {
+                    if (input.value.length === 0) {
+                        isComplete = false;
+                    }
+                });
+                
+                if (isComplete) {
+                    connectCodeBtn.style.opacity = '1';
+                } else {
+                    connectCodeBtn.style.opacity = '0.8';
+                }
+            }
+            
+            // 模拟二维码扫描成功
+            setTimeout(function() {
+                if (document.getElementById('scan-tab').classList.contains('active')) {
+                    showToast('二维码识别成功，正在连接...');
+                    setTimeout(function() {
+                        window.location.href = 'transfer_progress.html';
+                    }, 1500);
+                }
+            }, 5000);
+        });
+    </script>
+</body>
+</html> 

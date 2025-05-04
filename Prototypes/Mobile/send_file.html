@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FileLink - 文件选择</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/modern.css">
+    <style>
+        .page-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 50px);
+            padding: var(--spacing-md);
+        }
+        
+        .upload-container {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xl);
+            margin-top: var(--spacing-md);
+            flex: 1;
+        }
+        
+        .file-action-button {
+            background-color: white;
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+            display: flex;
+            align-items: center;
+        }
+        
+        .file-action-button:active {
+            transform: scale(0.98);
+            box-shadow: var(--shadow-sm);
+            border-color: var(--primary-color);
+        }
+        
+        .file-btn-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--border-radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: var(--spacing-md);
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+        
+        .file-btn-content {
+            flex: 1;
+        }
+        
+        .file-btn-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        
+        .file-btn-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        /* 已选文件区域 */
+        .selected-files {
+            margin-top: var(--spacing-xl);
+            background-color: var(--bg-color);
+            border-radius: var(--border-radius-lg);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            max-height: 0;
+        }
+        
+        .selected-files.show {
+            max-height: 300px;
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .selected-files-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--spacing-md);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .selected-files-title {
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+        
+        .selected-count {
+            font-size: 13px;
+            padding: 2px 8px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: var(--border-radius-full);
+        }
+        
+        .selected-files-clear {
+            font-size: 14px;
+            color: var(--primary-color);
+            background: none;
+            border: none;
+            padding: var(--spacing-xs) var(--spacing-sm);
+            cursor: pointer;
+        }
+        
+        .selected-files-list {
+            max-height: 220px;
+            overflow-y: auto;
+        }
+        
+        .selected-file-item {
+            display: flex;
+            align-items: center;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .selected-file-item:last-child {
+            border-bottom: none;
+        }
+        
+        .selected-file-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--border-radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: var(--spacing-md);
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        
+        .selected-file-info {
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        .selected-file-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 2px;
+        }
+        
+        .selected-file-size {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .selected-file-remove {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            color: var(--text-tertiary);
+            transition: all 0.2s ease;
+        }
+        
+        .selected-file-remove:active {
+            background-color: rgba(0, 0, 0, 0.05);
+            color: var(--error-color);
+        }
+        
+        /* 底部继续按钮 */
+        .continue-button {
+            position: fixed;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            padding: 0 var(--spacing-md);
+            margin-bottom: 50px;
+            z-index: 10;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(20px);
+            pointer-events: none;
+        }
+        
+        .continue-button.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="iphone-frame">
+        <!-- 状态栏 -->
+        <div class="status-bar">
+            <span>9:41</span>
+            <div>
+                <i class="fas fa-signal"></i>
+                <i class="fas fa-wifi"></i>
+                <i class="fas fa-battery-full"></i>
+            </div>
+        </div>
+
+        <!-- 主内容区域 -->
+        <div class="app-content">
+            <div class="content-wrapper">
+                <div class="navbar">
+                    <div class="btn-icon" id="backButton">
+                        <i class="fas fa-arrow-left"></i>
+                    </div>
+                    <div class="navbar-title">选择文件</div>
+                    <div style="width: 40px;"></div> <!-- 占位 -->
+                </div>
+                
+                <div class="page-container">
+                    <!-- 上传选项 -->
+                    <div class="upload-container">
+                        <!-- 从本地选择 -->
+                        <div class="file-action-button" id="localFileBtn">
+                            <div class="file-btn-icon" style="background-color: rgba(71, 118, 230, 0.1); color: var(--primary-color);">
+                                <i class="fas fa-folder-open"></i>
+                            </div>
+                            <div class="file-btn-content">
+                                <div class="file-btn-title">从本地选择文件</div>
+                                <div class="file-btn-desc">打开设备的文件系统选择文件</div>
+                            </div>
+                            <input type="file" id="fileInput" class="file-input" multiple>
+                        </div>
+                        
+                        <!-- 从照片库选择 -->
+                        <div class="file-action-button" id="photoLibraryBtn">
+                            <div class="file-btn-icon" style="background-color: rgba(72, 187, 120, 0.1); color: var(--success-color);">
+                                <i class="fas fa-images"></i>
+                            </div>
+                            <div class="file-btn-content">
+                                <div class="file-btn-title">从照片库选择</div>
+                                <div class="file-btn-desc">浏览并选择照片库中的图片和视频</div>
+                            </div>
+                            <input type="file" id="imageInput" class="file-input" accept="image/*,video/*" multiple>
+                        </div>
+                    </div>
+                    
+                    <!-- 已选文件区域 -->
+                    <div class="selected-files" id="selectedFiles">
+                        <div class="selected-files-header">
+                            <div class="selected-files-title">
+                                已选择文件
+                                <span class="selected-count" id="selectedCount">0</span>
+                            </div>
+                            <button class="selected-files-clear" id="clearBtn">清空</button>
+                        </div>
+                        
+                        <div class="selected-files-list" id="selectedFilesList">
+                            <!-- 动态填充已选文件 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 底部继续按钮 -->
+            <div class="continue-button" id="continueButton">
+                <button class="btn w-full">
+                    继续
+                    <i class="fas fa-arrow-right" style="margin-left: var(--spacing-sm);"></i>
+                </button>
+            </div>
+            
+            <!-- 底部导航条 -->
+            <div class="bottom-nav-bar">
+                <div class="bottom-line"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const backButton = document.getElementById('backButton');
+            const localFileBtn = document.getElementById('localFileBtn');
+            const photoLibraryBtn = document.getElementById('photoLibraryBtn');
+            const fileInput = document.getElementById('fileInput');
+            const imageInput = document.getElementById('imageInput');
+            const selectedFiles = document.getElementById('selectedFiles');
+            const selectedFilesList = document.getElementById('selectedFilesList');
+            const selectedCount = document.getElementById('selectedCount');
+            const clearBtn = document.getElementById('clearBtn');
+            const continueButton = document.getElementById('continueButton');
+            
+            let selectedFilesArray = [];
+            
+            // 返回按钮点击事件
+            backButton.addEventListener('click', function() {
+                window.location.href = 'index.html';
+            });
+            
+            // 从本地选择按钮点击事件
+            localFileBtn.addEventListener('click', function() {
+                fileInput.click();
+            });
+            
+            // 照片库按钮点击事件
+            photoLibraryBtn.addEventListener('click', function() {
+                imageInput.click();
+            });
+            
+            // 文件输入变化事件
+            fileInput.addEventListener('change', handleFileSelect);
+            imageInput.addEventListener('change', handleFileSelect);
+            
+            // 处理文件选择
+            function handleFileSelect(event) {
+                const files = event.target.files;
+                
+                if (!files || files.length === 0) {
+                    return;
+                }
+                
+                // 添加选择的文件到数组
+                Array.from(files).forEach(file => {
+                    // 检查文件是否已经选择
+                    const isDuplicate = selectedFilesArray.some(selectedFile => 
+                        selectedFile.name === file.name && 
+                        selectedFile.size === file.size &&
+                        selectedFile.lastModified === file.lastModified
+                    );
+                    
+                    if (!isDuplicate) {
+                        selectedFilesArray.push(file);
+                    }
+                });
+                
+                // 更新UI
+                updateSelectedFilesUI();
+                
+                // 重置input，允许重复选择同一文件
+                event.target.value = '';
+            }
+            
+            // 更新已选文件UI
+            function updateSelectedFilesUI() {
+                // 更新数量标签
+                selectedCount.textContent = selectedFilesArray.length;
+                
+                // 清空列表
+                selectedFilesList.innerHTML = '';
+                
+                // 添加文件项
+                selectedFilesArray.forEach((file, index) => {
+                    const fileItem = document.createElement('div');
+                    fileItem.className = 'selected-file-item';
+                    
+                    const iconClass = getFileIconClass(file.name);
+                    const iconColor = getFileIconColor(file.name);
+                    
+                    fileItem.innerHTML = `
+                        <div class="selected-file-icon" style="background-color: ${iconColor.bg}; color: ${iconColor.text};">
+                            <i class="${iconClass}"></i>
+                        </div>
+                        <div class="selected-file-info">
+                            <div class="selected-file-name">${file.name}</div>
+                            <div class="selected-file-size">${formatFileSize(file.size)}</div>
+                        </div>
+                        <div class="selected-file-remove" data-index="${index}">
+                            <i class="fas fa-times"></i>
+                        </div>
+                    `;
+                    
+                    selectedFilesList.appendChild(fileItem);
+                });
+                
+                // 更新显示状态
+                if (selectedFilesArray.length > 0) {
+                    selectedFiles.classList.add('show');
+                    continueButton.classList.add('show');
+                } else {
+                    selectedFiles.classList.remove('show');
+                    continueButton.classList.remove('show');
+                }
+                
+                // 添加删除文件事件
+                document.querySelectorAll('.selected-file-remove').forEach(removeBtn => {
+                    removeBtn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const index = parseInt(this.getAttribute('data-index'));
+                        removeSelectedFile(index);
+                    });
+                });
+            }
+            
+            // 移除选择的文件
+            function removeSelectedFile(index) {
+                if (index >= 0 && index < selectedFilesArray.length) {
+                    selectedFilesArray.splice(index, 1);
+                    updateSelectedFilesUI();
+                }
+            }
+            
+            // 清空选择的文件
+            clearBtn.addEventListener('click', function() {
+                selectedFilesArray = [];
+                updateSelectedFilesUI();
+                showToast('已清空选择的文件');
+            });
+            
+            // 继续按钮点击事件
+            continueButton.addEventListener('click', function() {
+                if (selectedFilesArray.length > 0) {
+                    // 模拟文件已选择，跳转下一步
+                    window.location.href = 'send_method.html';
+                } else {
+                    showToast('请先选择至少一个文件');
+                }
+            });
+            
+            // 获取文件图标class
+            function getFileIconClass(filename) {
+                const ext = filename.split('.').pop().toLowerCase();
+                
+                if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(ext)) {
+                    return 'fas fa-file-image';
+                } else if (['mp4', 'avi', 'mov', 'wmv', 'flv', 'mkv'].includes(ext)) {
+                    return 'fas fa-file-video';
+                } else if (['mp3', 'wav', 'ogg', 'flac', 'aac'].includes(ext)) {
+                    return 'fas fa-file-audio';
+                } else if (['pdf'].includes(ext)) {
+                    return 'fas fa-file-pdf';
+                } else if (['doc', 'docx'].includes(ext)) {
+                    return 'fas fa-file-word';
+                } else if (['xls', 'xlsx'].includes(ext)) {
+                    return 'fas fa-file-excel';
+                } else if (['ppt', 'pptx'].includes(ext)) {
+                    return 'fas fa-file-powerpoint';
+                } else if (['zip', 'rar', '7z', 'tar', 'gz'].includes(ext)) {
+                    return 'fas fa-file-archive';
+                } else {
+                    return 'fas fa-file';
+                }
+            }
+            
+            // 获取文件图标颜色
+            function getFileIconColor(filename) {
+                const ext = filename.split('.').pop().toLowerCase();
+                
+                if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(ext)) {
+                    return { bg: 'rgba(72, 187, 120, 0.1)', text: 'var(--success-color)' };
+                } else if (['mp4', 'avi', 'mov', 'wmv', 'flv', 'mkv'].includes(ext)) {
+                    return { bg: 'rgba(246, 173, 85, 0.1)', text: 'var(--warning-color)' };
+                } else if (['mp3', 'wav', 'ogg', 'flac', 'aac'].includes(ext)) {
+                    return { bg: 'rgba(245, 101, 101, 0.1)', text: 'var(--error-color)' };
+                } else if (['pdf'].includes(ext)) {
+                    return { bg: 'rgba(231, 76, 60, 0.1)', text: '#E74C3C' };
+                } else if (['doc', 'docx'].includes(ext)) {
+                    return { bg: 'rgba(71, 118, 230, 0.1)', text: 'var(--primary-color)' };
+                } else if (['xls', 'xlsx'].includes(ext)) {
+                    return { bg: 'rgba(72, 187, 120, 0.1)', text: 'var(--success-color)' };
+                } else if (['ppt', 'pptx'].includes(ext)) {
+                    return { bg: 'rgba(245, 101, 101, 0.1)', text: '#FF5733' };
+                } else if (['zip', 'rar', '7z', 'tar', 'gz'].includes(ext)) {
+                    return { bg: 'rgba(66, 153, 225, 0.1)', text: 'var(--info-color)' };
+                } else {
+                    return { bg: 'rgba(160, 174, 192, 0.1)', text: 'var(--text-tertiary)' };
+                }
+            }
+            
+            // 格式化文件大小
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 B';
+                
+                const k = 1024;
+                const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+            
+            // 显示提示信息的函数
+            function showToast(message) {
+                const toast = document.createElement('div');
+                toast.style.position = 'fixed';
+                toast.style.bottom = '100px';
+                toast.style.left = '50%';
+                toast.style.transform = 'translateX(-50%)';
+                toast.style.background = 'rgba(0, 0, 0, 0.8)';
+                toast.style.color = 'white';
+                toast.style.padding = '10px 20px';
+                toast.style.borderRadius = '30px';
+                toast.style.fontSize = '14px';
+                toast.style.fontWeight = '500';
+                toast.style.zIndex = '1000';
+                toast.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+                toast.textContent = message;
+                
+                document.body.appendChild(toast);
+                
+                setTimeout(function() {
+                    toast.style.opacity = '0';
+                    toast.style.transition = 'opacity 0.5s ease';
+                    
+                    setTimeout(function() {
+                        toast.remove();
+                    }, 500);
+                }, 2000);
+            }
+        });
+    </script>
+</body>
+</html> 

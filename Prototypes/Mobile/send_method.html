@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FileLink - 选择传输方式</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/modern.css">
+    <style>
+        .method-card {
+            position: relative;
+            overflow: hidden;
+            padding: var(--spacing-xl);
+            border-radius: var(--border-radius-lg);
+            margin-bottom: var(--spacing-lg);
+            background-color: var(--surface-color);
+            box-shadow: var(--shadow-sm);
+            border: var(--border-width) solid var(--border-color);
+            transition: all var(--transition-fast);
+        }
+        
+        .method-card.active {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(71, 118, 230, 0.1);
+        }
+        
+        .method-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            opacity: 0.06;
+            transform: translate(30%, -30%);
+            z-index: 0;
+        }
+        
+        .method-card.secondary::before {
+            background: linear-gradient(45deg, #8E54E9 0%, #4299E1 100%);
+            left: 0;
+            right: auto;
+            transform: translate(-30%, -30%);
+        }
+        
+        .method-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .method-badge {
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .method-icon {
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius-md);
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .method-icon i {
+            font-size: 28px;
+        }
+        
+        .method-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: var(--spacing-xs);
+            color: var(--text-primary);
+        }
+        
+        .method-description {
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-lg);
+            line-height: 1.5;
+        }
+        
+        .radio-indicator {
+            position: absolute;
+            top: var(--spacing-lg);
+            right: var(--spacing-lg);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid var(--border-color);
+            background-color: var(--surface-color);
+            transition: all var(--transition-fast);
+        }
+        
+        .method-card.active .radio-indicator {
+            border-color: var(--primary-color);
+            background-color: var(--primary-color);
+        }
+        
+        .method-card.active .radio-indicator::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            color: white;
+            font-size: 12px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .toast.show {
+            opacity: 1;
+            visibility: visible;
+        }
+    </style>
+</head>
+<body>
+    <div class="iphone-frame">
+        <!-- 状态栏 -->
+        <div class="status-bar">
+            <span>9:41</span>
+            <div>
+                <i class="fas fa-signal"></i>
+                <i class="fas fa-wifi"></i>
+                <i class="fas fa-battery-full"></i>
+            </div>
+        </div>
+
+        <!-- 主内容区域 -->
+        <div class="app-content">
+            <div class="content-wrapper">
+                <div class="navbar">
+                    <div class="btn-icon" id="backButton">
+                        <i class="fas fa-arrow-left"></i>
+                    </div>
+                    <div class="navbar-title">选择传输方式</div>
+                    <div style="width: 40px;"></div> <!-- 占位 -->
+                </div>
+                
+                <div class="container">
+                    <!-- 文件摘要卡片 -->
+                    <div class="card" style="margin-bottom: var(--spacing-lg);">
+                        <div class="flex items-center justify-between" style="margin-bottom: var(--spacing-sm);">
+                            <h3 style="font-size: 16px; margin-bottom: 0;">已选择文件</h3>
+                            <div class="badge badge-primary">7.5 MB</div>
+                        </div>
+                        
+                        <div class="flex items-center gap-sm">
+                            <div class="file-icon pdf" style="width: 36px; height: 36px; font-size: 18px;">
+                                <i class="fas fa-file-pdf"></i>
+                            </div>
+                            <div class="file-icon image" style="width: 36px; height: 36px; font-size: 18px;">
+                                <i class="fas fa-file-image"></i>
+                            </div>
+                            <div class="file-icon spreadsheet" style="width: 36px; height: 36px; font-size: 18px;">
+                                <i class="fas fa-file-excel"></i>
+                            </div>
+                            <span style="color: var(--text-secondary); font-size: 14px;">3个文件</span>
+                        </div>
+                    </div>
+                    
+                    <p class="text-center" style="margin-bottom: var(--spacing-lg);">选择您希望使用的传输方式</p>
+                    
+                    <!-- 传输方式选择 -->
+                    <div class="method-card active" id="lanMethod">
+                        <div class="radio-indicator"></div>
+                        <div class="method-content">
+                            <div class="badge badge-primary method-badge">高速 & 安全</div>
+                            <div class="method-icon" style="background-color: rgba(71, 118, 230, 0.1); color: var(--primary-color);">
+                                <i class="fas fa-wifi"></i>
+                            </div>
+                            <h3 class="method-title">局域网传输</h3>
+                            <p class="method-description">在同一网络环境中快速传输文件，无需互联网连接。速度更快，更加安全可靠。</p>
+                            
+                            <button class="btn w-full" id="lanMethodButton">
+                                <i class="fas fa-search" style="margin-right: var(--spacing-sm);"></i>
+                                搜索设备
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="method-card secondary" id="inetMethod">
+                        <div class="radio-indicator"></div>
+                        <div class="method-content">
+                            <div class="badge badge-primary method-badge" style="background-color: rgba(142, 84, 233, 0.1); color: var(--secondary-color);">随时随地</div>
+                            <div class="method-icon" style="background-color: rgba(142, 84, 233, 0.1); color: var(--secondary-color);">
+                                <i class="fas fa-globe"></i>
+                            </div>
+                            <h3 class="method-title">公网传输</h3>
+                            <p class="method-description">通过互联网连接传输文件，接收方通过密码接收。适合跨地域远程传输使用。</p>
+                            
+                            <button class="btn btn-secondary w-full" id="inetMethodButton">
+                                <i class="fas fa-key" style="margin-right: var(--spacing-sm);"></i>
+                                创建密码
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 方法对比信息 -->
+                    <div class="card" style="margin-top: var(--spacing-xl);">
+                        <h3 style="font-size: 16px; margin-bottom: var(--spacing-md);">传输方式对比</h3>
+                        
+                        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: var(--spacing-md); font-size: 14px;">
+                            <div style="font-weight: 500; color: var(--text-secondary);"></div>
+                            <div style="font-weight: 500; color: var(--text-secondary); text-align: center;">局域网</div>
+                            <div style="font-weight: 500; color: var(--text-secondary); text-align: center;">公网</div>
+                            
+                            <div style="color: var(--text-primary);">传输速度</div>
+                            <div style="color: var(--success-color); text-align: center;">极快</div>
+                            <div style="color: var(--warning-color); text-align: center;">中等</div>
+                            
+                            <div style="color: var(--text-primary);">传输距离</div>
+                            <div style="color: var(--warning-color); text-align: center;">仅局域网</div>
+                            <div style="color: var(--success-color); text-align: center;">无限制</div>
+                            
+                            <div style="color: var(--text-primary);">安全性</div>
+                            <div style="color: var(--success-color); text-align: center;">高</div>
+                            <div style="color: var(--success-color); text-align: center;">高</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 底部导航条 -->
+            <div class="bottom-nav-bar">
+                <div class="bottom-line"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 提示信息 -->
+    <div class="toast" id="toast"></div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const lanMethod = document.getElementById('lanMethod');
+            const inetMethod = document.getElementById('inetMethod');
+            const backButton = document.getElementById('backButton');
+            const lanMethodButton = document.getElementById('lanMethodButton');
+            const inetMethodButton = document.getElementById('inetMethodButton');
+            const toast = document.getElementById('toast');
+            
+            // 返回按钮点击事件
+            backButton.addEventListener('click', function() {
+                window.location.href = 'send_file.html';
+            });
+            
+            // 选择传输方式
+            lanMethod.addEventListener('click', function() {
+                lanMethod.classList.add('active');
+                inetMethod.classList.remove('active');
+                
+                // 更新按钮样式
+                lanMethodButton.className = 'btn w-full';
+                inetMethodButton.className = 'btn btn-secondary w-full';
+            });
+            
+            inetMethod.addEventListener('click', function() {
+                inetMethod.classList.add('active');
+                lanMethod.classList.remove('active');
+                
+                // 更新按钮样式
+                inetMethodButton.className = 'btn w-full';
+                lanMethodButton.className = 'btn btn-secondary w-full';
+            });
+            
+            // 局域网传输按钮点击事件
+            lanMethodButton.addEventListener('click', function() {
+                // 检查网络连接状态
+                if (navigator.onLine) {
+                    // 跳转到设备搜索页面
+                    window.location.href = 'discovery.html';
+                } else {
+                    showToast('网络连接不可用，请检查您的网络设置');
+                }
+            });
+            
+            // 公网传输按钮点击事件
+            inetMethodButton.addEventListener('click', function() {
+                // 检查网络连接状态
+                if (navigator.onLine) {
+                    // 跳转到公网密码页面
+                    window.location.href = 'inet_code.html';
+                } else {
+                    showToast('网络连接不可用，公网传输需要互联网连接');
+                }
+            });
+
+            // 显示提示信息
+            function showToast(message) {
+                toast.textContent = message;
+                toast.classList.add('show');
+                
+                setTimeout(function() {
+                    toast.classList.remove('show');
+                }, 2000);
+            }
+        });
+    </script>
+</body>
+</html> 

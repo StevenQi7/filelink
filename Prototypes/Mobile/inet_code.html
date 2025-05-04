@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FileLink - 公网传输密码</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/modern.css">
+    <style>
+        .inet-code-wrapper {
+            padding: 20px;
+        }
+        
+        .page-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .back-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            margin-right: 10px;
+        }
+        
+        .page-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .code-container {
+            background-color: var(--surface-color);
+            border-radius: 20px;
+            padding: 24px;
+            margin: 20px 0 30px;
+            text-align: center;
+            box-shadow: var(--shadow-default);
+        }
+        
+        .code-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        
+        .code-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        
+        .code-display {
+            background-color: rgba(71, 118, 230, 0.05);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-lg);
+            margin: var(--spacing-lg) 0;
+            text-align: center;
+            border: var(--border-width) solid rgba(71, 118, 230, 0.1);
+            position: relative;
+        }
+        
+        .code-number {
+            font-size: 42px;
+            font-weight: 700;
+            letter-spacing: 10px;
+            margin-bottom: var(--spacing-sm);
+            color: var(--primary-color);
+            animation: pulse 3s infinite;
+        }
+        
+        .code-timer {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-xs);
+        }
+        
+        .timer-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: var(--success-color);
+            border-radius: 50%;
+            animation: blink 1.5s infinite;
+        }
+        
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+        
+        .code-actions {
+            display: flex;
+            gap: var(--spacing-md);
+        }
+        
+        .action-button {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-xs);
+            padding: var(--spacing-sm) 0;
+            border-radius: var(--border-radius-md);
+            font-weight: 500;
+            font-size: 14px;
+            background-color: var(--surface-color);
+            color: var(--text-primary);
+            border: var(--border-width) solid var(--border-color);
+            transition: all var(--transition-fast);
+        }
+        
+        .action-button:active {
+            background-color: var(--bg-color);
+        }
+        
+        .selected-files-container {
+            background-color: var(--background-color);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .files-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .files-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .files-count {
+            font-size: 14px;
+            color: var(--primary-color);
+        }
+        
+        .file-list {
+            max-height: 220px;
+            overflow-y: auto;
+        }
+        
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .file-item:last-child {
+            border-bottom: none;
+        }
+        
+        .file-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background-color: var(--surface-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            color: var(--text-secondary);
+            font-size: 18px;
+        }
+        
+        .file-details {
+            flex: 1;
+        }
+        
+        .file-name {
+            font-size: 14px;
+            color: var(--text-primary);
+            margin-bottom: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 200px;
+        }
+        
+        .file-size {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 500;
+            background-color: rgba(82, 113, 255, 0.1);
+            color: var(--primary-color);
+        }
+        
+        .bottom-button {
+            position: fixed;
+            bottom: 30px;
+            left: 20px;
+            right: 20px;
+            height: 55px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 600;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(82, 113, 255, 0.3);
+        }
+        
+        .bottom-button i {
+            margin-right: 8px;
+        }
+        
+        .qr-container {
+            text-align: center;
+            margin: var(--spacing-xl) 0;
+            padding: var(--spacing-md);
+            background-color: var(--surface-color);
+            border-radius: var(--border-radius-lg);
+            border: var(--border-width) solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .qr-code {
+            width: 180px;
+            height: 180px;
+            margin: var(--spacing-md) auto;
+            background-color: white;
+            padding: var(--spacing-sm);
+            border-radius: var(--border-radius-md);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .qr-code img {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .qr-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+        
+        .transmission-info {
+            margin-top: var(--spacing-xl);
+            background-color: var(--bg-color);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-md);
+        }
+        
+        .info-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .status-pill {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .waiting-status {
+            background-color: rgba(246, 173, 85, 0.1);
+            color: var(--warning-color);
+        }
+        
+        /* 新增动画效果 */
+        @keyframes scaleIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .scale-in {
+            animation: scaleIn 0.5s forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="iphone-frame">
+        <!-- 状态栏 -->
+        <div class="status-bar">
+            <span>9:41</span>
+            <div>
+                <i class="fas fa-signal"></i>
+                <i class="fas fa-wifi"></i>
+                <i class="fas fa-battery-full"></i>
+            </div>
+        </div>
+
+        <!-- 主内容区域 -->
+        <div class="app-content">
+            <div class="content-wrapper">
+                <div class="inet-code-wrapper">
+                    <div class="page-header">
+                        <div class="back-button" id="backButton">
+                            <i class="fas fa-arrow-left"></i>
+                        </div>
+                        <div class="page-title">公网传输</div>
+                    </div>
+                    
+                    <div class="code-container">
+                        <div class="code-title">您的传输密码已生成</div>
+                        <div class="code-subtitle">接收方需要输入此6位密码来接收您的文件</div>
+                        
+                        <div class="code-display">
+                            <div class="code-number" id="transferCode">835719</div>
+                            <div class="code-timer">
+                                <span class="timer-dot"></span>
+                                有效期: <span id="countdownTimer">29:59</span>
+                            </div>
+                            
+                            <div class="code-actions">
+                                <button class="action-button" id="copyCodeBtn">
+                                    <i class="fas fa-copy"></i>
+                                    复制密码
+                                </button>
+                                <button class="action-button" id="shareCodeBtn">
+                                    <i class="fas fa-share-alt"></i>
+                                    分享
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="qr-container">
+                        <h3 style="font-size: 16px; color: var(--text-primary);">二维码接收</h3>
+                        <div class="qr-code">
+                            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYAAACWAQMAAAAGz+OhAAAABlBMVEX///8AAABVwtN+AAABYElEQVRIie2WMY7DMAxEKaBIn0M30UE4dMnBfRIZcJEiR5EB+xr2TWTAJ1lS0nGaIl2LAkOMxXhAjR4pikb6/LQ+OD0Cugc05ZiaUk6p4ZoVc9bMQbNAWvhN/TezhlnLDMwy8xfOCLNXZhUb6ZjVaEvMas1Ws+2ZvcyeZk+YnZlx5wIzFZhRYbbiJy3+0orvXPE7Ka5JcWWKryXhaxG+H/BdAu4TwB0DuHsA9xPgTgPcfW4VUlF1jE9GfJbi8xWf+Pi+YB0q1qRizazLrM+Md3vj5uDmomgb7j5kkSK7tS61m2oXrSitc0i7mXaTdjNZ5w3bF+8L7AvuK+4L9wX3lVQGUmGMVBqmUi2pWHukckmpYJOGTnFXMnc9cTc1d/1zLwruevNeEO9VwXt5eK8S75XzXknea8t7tXmvP77jwHcw+K4I31niO098N43vvvFdQb6bKWpXIbuvfLdXFKIPzjNjEu5TpfIAAAAASUVORK5CYII=" alt="QR Code">
+                        </div>
+                        <p style="font-size: 14px; color: var(--text-secondary);">接收方也可扫描此二维码接收文件</p>
+                    </div>
+                    
+                    <div class="selected-files-container">
+                        <div class="files-header">
+                            <div class="files-title">待传输文件</div>
+                            <div class="files-count">3 个文件 · 7.5 MB</div>
+                        </div>
+                        
+                        <div class="file-list">
+                            <div class="file-item">
+                                <div class="file-icon pdf">
+                                    <i class="fas fa-file-pdf"></i>
+                                </div>
+                                <div class="file-details">
+                                    <div class="file-name">项目计划书.pdf</div>
+                                    <div class="file-size">2.5 MB</div>
+                                </div>
+                                <div class="status-pill waiting-status">
+                                    <i class="fas fa-clock"></i>
+                                    等待连接
+                                </div>
+                            </div>
+                            
+                            <div class="file-item">
+                                <div class="file-icon image">
+                                    <i class="fas fa-file-image"></i>
+                                </div>
+                                <div class="file-details">
+                                    <div class="file-name">会议照片.jpg</div>
+                                    <div class="file-size">3.8 MB</div>
+                                </div>
+                                <div class="status-pill waiting-status">
+                                    <i class="fas fa-clock"></i>
+                                    等待连接
+                                </div>
+                            </div>
+                            
+                            <div class="file-item">
+                                <div class="file-icon spreadsheet">
+                                    <i class="fas fa-file-excel"></i>
+                                </div>
+                                <div class="file-details">
+                                    <div class="file-name">财务报表.xlsx</div>
+                                    <div class="file-size">1.2 MB</div>
+                                </div>
+                                <div class="status-pill waiting-status">
+                                    <i class="fas fa-clock"></i>
+                                    等待连接
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="fixed-bottom-button" id="startTransferBtn">
+                <button class="btn w-full btn-lg">
+                    <i class="fas fa-paper-plane" style="margin-right: var(--spacing-sm);"></i>
+                    开始传输
+                </button>
+            </div>
+            
+            <!-- 底部导航条 -->
+            <div class="bottom-nav-bar">
+                <div class="bottom-line"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const backButton = document.getElementById('backButton');
+            const copyCodeBtn = document.getElementById('copyCodeBtn');
+            const shareCodeBtn = document.getElementById('shareCodeBtn');
+            const startTransferBtn = document.getElementById('startTransferBtn');
+            const transferCode = document.getElementById('transferCode');
+            const countdownTimer = document.getElementById('countdownTimer');
+            
+            // 生成随机6位密码
+            function generateRandomCode() {
+                let code = '';
+                for (let i = 0; i < 6; i++) {
+                    code += Math.floor(Math.random() * 10);
+                }
+                return code;
+            }
+            
+            // 设置随机密码
+            transferCode.textContent = generateRandomCode();
+            
+            // 返回按钮点击事件
+            backButton.addEventListener('click', function() {
+                window.location.href = 'send_method.html';
+            });
+            
+            // 复制密码按钮事件
+            copyCodeBtn.addEventListener('click', function() {
+                // 复制密码到剪贴板
+                navigator.clipboard.writeText(transferCode.textContent)
+                    .then(() => {
+                        showToast('密码已复制到剪贴板');
+                    })
+                    .catch(() => {
+                        // 备用复制方法
+                        const tempInput = document.createElement('input');
+                        tempInput.value = transferCode.textContent;
+                        document.body.appendChild(tempInput);
+                        tempInput.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(tempInput);
+                        showToast('密码已复制到剪贴板');
+                    });
+            });
+            
+            // 分享按钮事件
+            shareCodeBtn.addEventListener('click', function() {
+                // 尝试使用Web分享API分享
+                const shareText = `使用FileLink接收我的文件，输入密码: ${transferCode.textContent}`;
+                
+                if (navigator.share) {
+                    navigator.share({
+                        title: 'FileLink传输密码',
+                        text: shareText,
+                    })
+                    .catch(() => {
+                        // 分享功能不可用时，显示提示
+                        showToast('分享功能不可用');
+                    });
+                } else {
+                    // 如果Web分享API不可用，显示提示
+                    showToast('请手动复制密码分享给对方');
+                }
+            });
+            
+            // 开始传输按钮事件
+            startTransferBtn.addEventListener('click', function() {
+                showToast('正在等待连接...');
+                
+                // 模拟1秒后自动跳转
+                setTimeout(function() {
+                    window.location.href = 'transfer_progress.html';
+                }, 1500);
+            });
+            
+            // 显示提示信息的函数
+            function showToast(message) {
+                const toast = document.createElement('div');
+                toast.style.position = 'fixed';
+                toast.style.bottom = '120px';
+                toast.style.left = '50%';
+                toast.style.transform = 'translateX(-50%)';
+                toast.style.background = 'rgba(0, 0, 0, 0.8)';
+                toast.style.color = 'white';
+                toast.style.padding = '10px 20px';
+                toast.style.borderRadius = '30px';
+                toast.style.fontSize = '14px';
+                toast.style.fontWeight = '500';
+                toast.style.zIndex = '1000';
+                toast.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+                toast.textContent = message;
+                
+                document.body.appendChild(toast);
+                
+                setTimeout(function() {
+                    toast.style.opacity = '0';
+                    toast.style.transition = 'opacity 0.5s ease';
+                    
+                    setTimeout(function() {
+                        toast.remove();
+                    }, 500);
+                }, 2000);
+            }
+            
+            // 倒计时定时器
+            let minutes = 29;
+            let seconds = 59;
+            
+            setInterval(function() {
+                seconds--;
+                if (seconds < 0) {
+                    minutes--;
+                    seconds = 59;
+                }
+                
+                if (minutes < 0) {
+                    minutes = 0;
+                    seconds = 0;
+                }
+                
+                const minutesStr = minutes < 10 ? '0' + minutes : minutes;
+                const secondsStr = seconds < 10 ? '0' + seconds : seconds;
+                const timeStr = `${minutesStr}:${secondsStr}`;
+                countdownTimer.textContent = timeStr;
+            }, 1000);
+        });
+    </script>
+</body>
+</html> 
