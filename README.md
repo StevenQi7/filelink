@@ -129,3 +129,94 @@ FileLink/
 ## 📄 许可协议
 
 本项目采用 [MIT 许可证](LICENSE)。
+
+# FileLink 信令服务器
+
+这是一个基于 WebRTC 的 FileLink 应用的信令服务器，用于支持设备间的文件传输。
+
+## 功能特性
+
+- 会话管理：创建、加入、维护和关闭传输会话
+- WebRTC 信令：支持 SDP 交换和 ICE 候选传递
+- 文件传输状态同步：跟踪文件传输进度
+- WebSocket 实时通信：设备间的实时状态更新
+
+## 技术栈
+
+- Node.js
+- Next.js：服务端渲染框架
+- Express：HTTP 服务器
+- Socket.IO：WebSocket 通信
+- 自定义会话和信令处理
+
+## 安装
+
+```bash
+# 克隆仓库
+git clone https://github.com/your-username/filelink.git
+cd filelink/server
+
+# 安装依赖
+npm install
+```
+
+## 配置
+
+在项目根目录创建 `.env` 文件:
+
+```
+PORT=3000
+NODE_ENV=development
+SESSION_TIMEOUT=600000  # 会话超时时间（毫秒）
+```
+
+## 运行
+
+```bash
+# 开发模式
+npm run dev
+
+# 生产模式
+npm run build
+npm start
+```
+
+服务将在 http://localhost:3000 （或环境变量中配置的端口）上启动。
+
+## API 端点
+
+### 会话管理
+
+- `POST /api/session/create` - 创建新的传输会话
+- `POST /api/session/join` - 加入现有会话
+- `POST /api/session/{sessionId}/heartbeat` - 保持会话活跃
+- `POST /api/session/{sessionId}/close` - 关闭会话
+
+### WebRTC 信令
+
+- `POST /api/session/{sessionId}/offer` - 发送 SDP 提议
+- `POST /api/session/{sessionId}/answer` - 发送 SDP 应答
+- `POST /api/session/{sessionId}/ice-candidate` - 发送 ICE 候选
+
+### 文件传输
+
+- `POST /api/session/{sessionId}/files` - 同步文件信息
+- `POST /api/session/{sessionId}/transfer-status` - 更新传输状态
+
+### WebSocket
+
+- `ws://[host]/ws` - WebSocket 连接地址（需要 `sessionId` 和 `deviceId` 查询参数）
+
+## 测试页面
+
+访问 http://localhost:3000/test.html 可以打开测试页面，用于验证服务器功能。
+
+## 部署
+
+服务器可以部署到任何支持 Node.js 的环境，如 Vercel、Heroku、AWS 或自托管服务器。
+
+确保配置正确的环境变量，特别是在生产环境中。
+
+## 许可证
+
+MIT
