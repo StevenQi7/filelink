@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FileLink - 设置</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/modern.css">
+    <style>
+        .settings-header {
+            display: flex;
+            align-items: center;
+            padding: var(--spacing-lg) var(--spacing-md);
+            border-bottom: 1px solid var(--border-color);
+            background-color: white;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .back-button {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-primary);
+            margin-right: var(--spacing-md);
+        }
+        
+        .back-button:active {
+            background-color: var(--bg-color);
+        }
+        
+        .settings-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+        
+        .settings-section {
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin: var(--spacing-lg) var(--spacing-md) var(--spacing-sm);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .settings-item {
+            display: flex;
+            align-items: center;
+            padding: var(--spacing-md);
+            background-color: white;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        
+        .settings-item:active {
+            background-color: var(--bg-color);
+        }
+        
+        .settings-item:first-child {
+            border-top-left-radius: var(--border-radius-lg);
+            border-top-right-radius: var(--border-radius-lg);
+        }
+        
+        .settings-item:last-child {
+            border-bottom: none;
+            border-bottom-left-radius: var(--border-radius-lg);
+            border-bottom-right-radius: var(--border-radius-lg);
+        }
+        
+        .setting-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: var(--spacing-md);
+            flex-shrink: 0;
+        }
+        
+        .setting-icon i {
+            font-size: 16px;
+            color: white;
+        }
+        
+        .icon-blue { background-color: #4776E6; }
+        .icon-purple { background-color: #8E54E9; }
+        .icon-orange { background-color: #FF8A50; }
+        .icon-green { background-color: #36B37E; }
+        .icon-teal { background-color: #20C997; }
+        .icon-indigo { background-color: #6C5CE7; }
+        .icon-pink { background-color: #FD79A8; }
+        .icon-gray { background-color: #74B9FF; }
+        .icon-red { background-color: #E84855; }
+        
+        .setting-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .setting-label {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        
+        .setting-value {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-right: var(--spacing-sm);
+        }
+        
+        .setting-arrow {
+            color: var(--text-tertiary);
+            font-size: 14px;
+        }
+        
+        .setting-toggle {
+            position: relative;
+            width: 48px;
+            height: 28px;
+            border-radius: 14px;
+            background-color: var(--bg-color);
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .setting-toggle.active {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .toggle-knob {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: white;
+            transition: transform 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .setting-toggle.active .toggle-knob {
+            transform: translateX(20px);
+        }
+        
+        .storage-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .storage-size {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-right: var(--spacing-sm);
+        }
+    </style>
+</head>
+<body>
+    <div class="iphone-frame">
+        <!-- 状态栏 -->
+        <div class="status-bar">
+            <span>17:10</span>
+            <div>
+                <i class="fas fa-signal"></i>
+                <i class="fas fa-wifi"></i>
+                <span style="font-size: 12px; color: #34C759; font-weight: 600;">89%</span>
+            </div>
+        </div>
+
+        <!-- 主内容区域 -->
+        <div class="app-content">
+            <!-- 设置页面头部 -->
+            <div class="settings-header">
+                <button class="back-button" id="backBtn">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <h1 class="settings-title">设置</h1>
+            </div>
+            
+            <!-- 设置内容 -->
+            <div class="content-wrapper">
+                <!-- 常规设置 -->
+                <div class="settings-section">
+                    <div class="section-title">常规设置</div>
+                    <div class="settings-group">
+                        <div class="settings-item" id="deviceNameItem">
+                            <div class="setting-icon icon-blue">
+                                <i class="fas fa-mobile-alt"></i>
+                            </div>
+                            <div class="setting-content">
+                                <div class="setting-label">设备名称</div>
+                                <div style="display: flex; align-items: center;">
+                                    <div class="setting-value">iPhone</div>
+                                    <i class="fas fa-chevron-right setting-arrow"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-item" id="darkModeItem">
+                            <div class="setting-icon icon-purple">
+                                <i class="fas fa-moon"></i>
+                            </div>
+                            <div class="setting-content">
+                                <div class="setting-label">深色模式</div>
+                                <div class="setting-toggle" id="darkModeToggle">
+                                    <div class="toggle-knob"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-item" id="languageItem">
+                            <div class="setting-icon icon-orange">
+                                <i class="fas fa-globe"></i>
+                            </div>
+                            <div class="setting-content">
+                                <div class="setting-label">语言</div>
+                                <div style="display: flex; align-items: center;">
+                                    <div class="setting-value">跟随系统</div>
+                                    <i class="fas fa-chevron-right setting-arrow"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 安全设置 -->
+                <div class="settings-section">
+                    <div class="section-title">安全设置</div>
+                    <div class="settings-group">
+                        <div class="settings-item" id="autoAcceptItem">
+                            <div class="setting-icon icon-green">
+                                <i class="fas fa-download"></i>
+                            </div>
+                            <div class="setting-content">
+                                <div class="setting-label">信任设备自动接收</div>
+                                <div class="setting-toggle" id="autoAcceptToggle">
+                                    <div class="toggle-knob"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-item" id="trustedDevicesItem">
+                            <div class="setting-icon icon-teal">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <div class="setting-content">
+                                <div class="setting-label">管理信任设备</div>
+                                <div style="display: flex; align-items: center;">
+                                    <div class="setting-value">0个设备</div>
+                                    <i class="fas fa-chevron-right setting-arrow"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-item" id="encryptionItem">
+                            <div class="setting-icon icon-indigo">
+                                <i class="fas fa-lock"></i>
+                            </div>
+                            <div class="setting-content">
+                                <div class="setting-label">端到端加密</div>
+                                <div class="setting-toggle" id="encryptionToggle">
+                                    <div class="toggle-knob"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-item" id="privacyModeItem">
+                            <div class="setting-icon icon-gray">
+                                <i class="fas fa-eye-slash"></i>
+                            </div>
+                            <div class="setting-content">
+                                <div class="setting-label">隐私模式</div>
+                                <div class="setting-toggle" id="privacyModeToggle">
+                                    <div class="toggle-knob"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 存储与缓存 -->
+                <div class="settings-section">
+                    <div class="section-title">存储与缓存</div>
+                    <div class="settings-group">
+                        <div class="settings-item" id="clearCacheItem">
+                            <div class="setting-icon icon-red">
+                                <i class="fas fa-trash"></i>
+                            </div>
+                            <div class="setting-content">
+                                <div class="setting-label">清除缓存</div>
+                                <div style="display: flex; align-items: center;">
+                                    <div class="setting-value">1.2MB</div>
+                                    <i class="fas fa-chevron-right setting-arrow"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 关于 -->
+                <div class="settings-section">
+                    <div class="section-title">关于</div>
+                    <div class="settings-group">
+                        <div class="settings-item" id="aboutItem">
+                            <div class="setting-icon icon-pink">
+                                <i class="fas fa-info"></i>
+                            </div>
+                            <div class="setting-content">
+                                <div class="setting-label">关于 FileLink</div>
+                                <div style="display: flex; align-items: center;">
+                                    <div class="setting-value">版本 1.0.0</div>
+                                    <i class="fas fa-chevron-right setting-arrow"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 底部导航条 -->
+            <div class="bottom-nav-bar">
+                <div class="bottom-line"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 返回按钮
+            document.getElementById('backBtn').addEventListener('click', function() {
+                window.location.href = 'index.html';
+            });
+            
+            // 开关切换功能
+            function setupToggle(toggleId) {
+                const toggle = document.getElementById(toggleId);
+                if (toggle) {
+                    toggle.addEventListener('click', function() {
+                        this.classList.toggle('active');
+                        const isActive = this.classList.contains('active');
+                        console.log(`${toggleId} toggled to: ${isActive}`);
+                    });
+                }
+            }
+            
+            // 设置所有开关
+            setupToggle('darkModeToggle');
+            setupToggle('autoAcceptToggle');
+            setupToggle('encryptionToggle');
+            setupToggle('privacyModeToggle');
+            
+            // 设置项点击事件
+            document.getElementById('deviceNameItem').addEventListener('click', function() {
+                showToast('设备名称设置功能开发中...');
+            });
+            
+            document.getElementById('languageItem').addEventListener('click', function() {
+                showToast('语言设置功能开发中...');
+            });
+            
+            document.getElementById('trustedDevicesItem').addEventListener('click', function() {
+                showToast('信任设备管理功能开发中...');
+            });
+            
+            document.getElementById('clearCacheItem').addEventListener('click', function() {
+                if (confirm('确定要清除缓存吗？')) {
+                    showToast('缓存已清除');
+                    const sizeElement = document.querySelector('#clearCacheItem .setting-value');
+                    sizeElement.textContent = '0MB';
+                }
+            });
+            
+            document.getElementById('aboutItem').addEventListener('click', function() {
+                showToast('关于页面功能开发中...');
+            });
+            
+            // 显示提示信息的函数
+            function showToast(message) {
+                const toast = document.createElement('div');
+                toast.style.position = 'fixed';
+                toast.style.bottom = '100px';
+                toast.style.left = '50%';
+                toast.style.transform = 'translateX(-50%)';
+                toast.style.background = 'rgba(0, 0, 0, 0.8)';
+                toast.style.color = 'white';
+                toast.style.padding = '10px 20px';
+                toast.style.borderRadius = '30px';
+                toast.style.fontSize = '14px';
+                toast.style.fontWeight = '500';
+                toast.style.zIndex = '1000';
+                toast.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+                toast.textContent = message;
+                
+                document.body.appendChild(toast);
+                
+                setTimeout(function() {
+                    toast.style.opacity = '0';
+                    toast.style.transition = 'opacity 0.5s ease';
+                    
+                    setTimeout(function() {
+                        toast.remove();
+                    }, 500);
+                }, 2000);
+            }
+        });
+    </script>
+</body>
+</html> 
