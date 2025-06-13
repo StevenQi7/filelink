@@ -3,578 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FileLink - 接收文件</title>
+    <title>接收文件 - FileLink</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/styles.css">
-    <style>
-        /* 接收文件页面样式 */
-        .receive-area {
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        
-        .page-subtitle {
-            font-size: 16px;
-            color: var(--text-secondary);
-            margin-bottom: 20px;
-        }
-        
-        .receive-methods {
-            display: flex;
-            gap: 30px;
-            margin-bottom: 30px;
-        }
-        
-        .receive-method-card {
-            flex: 1;
-            background-color: white;
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            box-shadow: var(--shadow-default);
-            display: flex;
-            flex-direction: column;
-            min-height: 400px;
-            border: 2px solid transparent;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        
-        .receive-method-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-        }
-        
-        .receive-method-card.active {
-            border-color: var(--primary-color);
-        }
-        
-        .method-header {
-            padding: 25px;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-        }
-        
-        .method-icon-container {
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 15px;
-            flex-shrink: 0;
-        }
-        
-        .password-icon {
-            background-color: rgba(115, 83, 229, 0.1);
-            color: var(--secondary-color);
-        }
-        
-        .lan-icon {
-            background-color: rgba(82, 113, 255, 0.1);
-            color: var(--primary-color);
-        }
-        
-        .method-icon {
-            font-size: 24px;
-        }
-        
-        .method-info {
-            flex: 1;
-        }
-        
-        .method-title {
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 5px;
-        }
-        
-        .method-description {
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
-        
-        .method-content {
-            flex: 1;
-            padding: 25px;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        /* 密码接收样式 */
-        .password-input-area {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .password-instruction {
-            font-size: 15px;
-            color: var(--text-secondary);
-            line-height: 1.6;
-            margin-bottom: 30px;
-        }
-        
-        .password-form {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            max-width: 400px;
-        }
-        
-        .password-container {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .password-digit {
-            flex: 1;
-            height: 70px;
-            border: 2px solid var(--border-color);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            font-weight: 600;
-            color: var(--text-primary);
-            background-color: white;
-            transition: all 0.2s ease;
-        }
-        
-        .password-digit:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(82, 113, 255, 0.2);
-            outline: none;
-        }
-        
-        .password-digit.filled {
-            border-color: var(--primary-color);
-            background-color: rgba(82, 113, 255, 0.05);
-        }
-        
-        .password-input {
-            position: absolute;
-            opacity: 0;
-            pointer-events: none;
-        }
-        
-        .password-info {
-            font-size: 14px;
-            color: var(--text-secondary);
-            margin-top: 15px;
-        }
-        
-        .receive-button {
-            padding: 14px;
-            font-size: 16px;
-            font-weight: 600;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border: none;
-            margin-top: 20px;
-        }
-        
-        .password-button {
-            background-color: var(--secondary-color);
-            color: white;
-        }
-        
-        .password-button:hover {
-            background-color: #6241D0;
-        }
-        
-        .password-button:disabled {
-            background-color: #A9A9A9;
-            cursor: not-allowed;
-        }
-        
-        /* 局域网接收样式 */
-        .lan-receive-area {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .lan-instruction {
-            font-size: 15px;
-            color: var(--text-secondary);
-            line-height: 1.6;
-            margin-bottom: 30px;
-        }
-        
-        .lan-button {
-            background-color: var(--primary-color);
-            color: white;
-        }
-        
-        .lan-button:hover {
-            background-color: #4560e0;
-        }
-        
-        .lan-button i {
-            margin-right: 10px;
-        }
-        
-        /* 保存位置选择 */
-        .save-location {
-            background-color: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow-default);
-            padding: 20px;
-            margin-top: 20px;
-        }
-        
-        .save-location-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-        }
-        
-        .save-location-title i {
-            margin-right: 10px;
-            color: var(--text-secondary);
-        }
-        
-        .location-selector {
-            display: flex;
-            align-items: center;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 10px 15px;
-            font-size: 14px;
-            color: var(--text-primary);
-            background-color: var(--light-bg);
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        
-        .location-selector:hover {
-            background-color: white;
-            border-color: var(--primary-color);
-        }
-        
-        .location-selector i {
-            margin-right: 10px;
-            color: var(--text-secondary);
-        }
-        
-        .location-path {
-            flex: 1;
-        }
-        
-        .change-button {
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--primary-color);
-            margin-left: 10px;
-            transition: all 0.2s ease;
-        }
-        
-        .change-button:hover {
-            text-decoration: underline;
-        }
-        
-        /* 响应式样式 */
-        @media (max-width: 1024px) {
-            .receive-methods {
-                flex-direction: column;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="css/macos.css">
 </head>
 <body>
-    <div class="desktop-container">
-        <!-- 侧边栏 -->
-        <div class="sidebar">
-            <div class="sidebar-header">
-                <div class="sidebar-logo">
-                    <i class="fas fa-link"></i>
-                    FileLink
-                </div>
+    <div class="mac-window">
+        <div class="mac-titlebar">
+            <div class="mac-window-controls">
+                <div class="mac-btn mac-btn-close"></div>
+                <div class="mac-btn mac-btn-minimize"></div>
+                <div class="mac-btn mac-btn-maximize"></div>
             </div>
-            <div class="sidebar-content">
-                <ul class="sidebar-menu">
-                    <li class="sidebar-menu-item">
-                        <a href="index.html" class="sidebar-menu-link">
-                            <i class="fas fa-home sidebar-menu-icon"></i>
-                            主页
-                        </a>
-                    </li>
-                    <li class="sidebar-menu-item">
-                        <a href="send_file.html" class="sidebar-menu-link">
-                            <i class="fas fa-paper-plane sidebar-menu-icon"></i>
-                            发送文件
-                        </a>
-                    </li>
-                    <li class="sidebar-menu-item">
-                        <a href="receive_file.html" class="sidebar-menu-link active">
-                            <i class="fas fa-download sidebar-menu-icon"></i>
-                            接收文件
-                        </a>
-                    </li>
-                    <li class="sidebar-menu-item">
-                        <a href="#" class="sidebar-menu-link">
-                            <i class="fas fa-history sidebar-menu-icon"></i>
-                            传输记录
-                        </a>
-                    </li>
-                    <li class="sidebar-menu-item">
-                        <a href="#" class="sidebar-menu-link">
-                            <i class="fas fa-cog sidebar-menu-icon"></i>
-                            设置
-                        </a>
-                    </li>
-                </ul>
-            </div>
-            <div class="sidebar-footer">
-                <div class="user-info">
-                    <div class="user-avatar">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <div style="margin-left: 10px;">
-                        <div class="user-name">我的电脑</div>
-                        <div class="user-device">FileLink 桌面端</div>
-                    </div>
-                </div>
+            <div class="mac-window-title">接收文件 - FileLink</div>
+        </div>
+        <div class="mac-toolbar">
+            <div class="mac-toolbar-section right">
+                <button class="mac-toolbar-button"><i class="fas fa-question-circle"></i></button>
             </div>
         </div>
-        
-        <!-- 主内容区域 -->
-        <div class="main-content">
-            <div class="topbar">
-                <div class="page-title">接收文件</div>
-                <div class="topbar-actions">
-                    <button class="topbar-btn" title="更多选项">
-                        <i class="fas fa-ellipsis-v"></i>
-                    </button>
+        <div class="mac-content">
+            <div class="mac-sidebar">
+                <div class="mac-sidebar-section">
+                    <div class="mac-sidebar-header">
+                        <span class="mac-sidebar-title">功能</span>
+                    </div>
+                    <ul class="mac-sidebar-items">
+                        <li class="mac-sidebar-item" onclick="location.href='index.html'"><i class="fas fa-home mac-sidebar-icon"></i><span class="mac-sidebar-label">主页</span></li>
+                        <li class="mac-sidebar-item" onclick="location.href='send_file.html'"><i class="fas fa-paper-plane mac-sidebar-icon"></i><span class="mac-sidebar-label">发送文件</span></li>
+                        <li class="mac-sidebar-item active"><i class="fas fa-download mac-sidebar-icon"></i><span class="mac-sidebar-label">接收文件</span></li>
+                        <li class="mac-sidebar-item"><i class="fas fa-history mac-sidebar-icon"></i><span class="mac-sidebar-label">传输历史</span></li>
+                    </ul>
+                </div>
+                <div class="mac-sidebar-section">
+                    <div class="mac-sidebar-header">
+                        <span class="mac-sidebar-title">最近传输的设备</span>
+                    </div>
+                    <ul class="mac-sidebar-items">
+                        <li class="mac-sidebar-item"><i class="fas fa-mobile-alt mac-sidebar-icon"></i><span class="mac-sidebar-label">iPhone 13</span></li>
+                        <li class="mac-sidebar-item"><i class="fas fa-tablet-alt mac-sidebar-icon"></i><span class="mac-sidebar-label">iPad Pro</span></li>
+                    </ul>
+                </div>
+                <div class="sidebar-footer" style="margin-top:auto;">
+                    <button class="mac-toolbar-button" style="width:100%;justify-content:flex-start;"><i class="fas fa-cog"></i><span style="margin-left:8px;">设置</span></button>
                 </div>
             </div>
-            
-            <div class="content-area">
-                <div class="receive-area">
-                    <div>
-                        <h2>选择接收方式</h2>
-                        <p class="page-subtitle">请选择您要使用的文件接收方式</p>
+            <div class="mac-main">
+                <h1 style="font-size: 24px; margin-bottom: 24px;">接收文件</h1>
+                <div class="mac-card" style="padding: 32px 24px; max-width: 420px; margin: 0 auto 32px auto;">
+                    <h2 style="font-size: 18px; font-weight: 500; margin-bottom: 20px; text-align:center;">输入连接密码</h2>
+                    <p style="font-size: 14px; color: var(--mac-text-secondary); margin-bottom: 24px; text-align:center;">请向发送方索取6位连接密码</p>
+                    <div style="display: flex; justify-content: center; gap: 12px; margin-bottom: 32px;">
+                        <input type="text" maxlength="1" class="code-input" style="width: 50px; height: 60px; border-radius: var(--mac-border-radius-md); border: 1px solid var(--mac-border-color); background-color: white; font-size: 24px; font-weight: 500; text-align: center; outline: none;">
+                        <input type="text" maxlength="1" class="code-input" style="width: 50px; height: 60px; border-radius: var(--mac-border-radius-md); border: 1px solid var(--mac-border-color); background-color: white; font-size: 24px; font-weight: 500; text-align: center; outline: none;">
+                        <input type="text" maxlength="1" class="code-input" style="width: 50px; height: 60px; border-radius: var(--mac-border-radius-md); border: 1px solid var(--mac-border-color); background-color: white; font-size: 24px; font-weight: 500; text-align: center; outline: none;">
+                        <input type="text" maxlength="1" class="code-input" style="width: 50px; height: 60px; border-radius: var(--mac-border-radius-md); border: 1px solid var(--mac-border-color); background-color: white; font-size: 24px; font-weight: 500; text-align: center; outline: none;">
+                        <input type="text" maxlength="1" class="code-input" style="width: 50px; height: 60px; border-radius: var(--mac-border-radius-md); border: 1px solid var(--mac-border-color); background-color: white; font-size: 24px; font-weight: 500; text-align: center; outline: none;">
+                        <input type="text" maxlength="1" class="code-input" style="width: 50px; height: 60px; border-radius: var(--mac-border-radius-md); border: 1px solid var(--mac-border-color); background-color: white; font-size: 24px; font-weight: 500; text-align: center; outline: none;">
                     </div>
-                    
-                    <div class="receive-methods">
-                        <!-- 密码接收 -->
-                        <div class="receive-method-card active" id="passwordCard">
-                            <div class="method-header">
-                                <div class="method-icon-container password-icon">
-                                    <i class="fas fa-key method-icon"></i>
-                                </div>
-                                <div class="method-info">
-                                    <div class="method-title">密码接收</div>
-                                    <div class="method-description">通过输入密码接收文件</div>
-                                </div>
-                            </div>
-                            <div class="method-content">
-                                <div class="password-input-area">
-                                    <p class="password-instruction">
-                                        请输入文件发送方提供的 6 位数字密码，以建立安全连接并接收文件。
-                                    </p>
-                                    
-                                    <div class="password-form">
-                                        <div class="password-container" id="passwordContainer">
-                                            <input type="text" class="password-input" id="passwordInput" maxlength="6" pattern="[0-9]*" inputmode="numeric">
-                                            <div class="password-digit" data-index="0"></div>
-                                            <div class="password-digit" data-index="1"></div>
-                                            <div class="password-digit" data-index="2"></div>
-                                            <div class="password-digit" data-index="3"></div>
-                                            <div class="password-digit" data-index="4"></div>
-                                            <div class="password-digit" data-index="5"></div>
-                                        </div>
-                                        
-                                        <p class="password-info">
-                                            <i class="fas fa-info-circle" style="margin-right: 5px;"></i>
-                                            密码由发送方生成，仅在发送会话有效期内可用
-                                        </p>
-                                        
-                                        <button class="receive-button password-button" id="passwordReceiveBtn" disabled>
-                                            <i class="fas fa-download" style="margin-right: 8px;"></i>
-                                            接收文件
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- 局域网接收 -->
-                        <div class="receive-method-card" id="lanCard">
-                            <div class="method-header">
-                                <div class="method-icon-container lan-icon">
-                                    <i class="fas fa-wifi method-icon"></i>
-                                </div>
-                                <div class="method-info">
-                                    <div class="method-title">局域网接收</div>
-                                    <div class="method-description">搜索本地网络设备</div>
-                                </div>
-                            </div>
-                            <div class="method-content">
-                                <div class="lan-receive-area">
-                                    <p class="lan-instruction">
-                                        通过局域网搜索可以发现同一网络下的设备，无需输入密码即可接收文件。要求发送方和接收方连接到同一个网络（如相同的 WiFi）。
-                                    </p>
-                                    
-                                    <button class="receive-button lan-button" id="lanSearchBtn">
-                                        <i class="fas fa-search"></i>
-                                        搜索附近设备
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                    <div style="display: flex; justify-content: center;">
+                        <button class="mac-button mac-button-primary" id="connect-btn" style="padding: 8px 24px; font-size: 14px;"><i class="fas fa-link mac-button-icon"></i>连接</button>
                     </div>
-                    
-                    <!-- 保存位置选择 -->
-                    <div class="save-location">
-                        <div class="save-location-title">
-                            <i class="fas fa-folder"></i>
-                            文件保存位置
-                        </div>
-                        <div class="location-selector" id="locationSelector">
-                            <i class="fas fa-folder-open"></i>
-                            <div class="location-path" id="savePath">下载/FileLink接收的文件</div>
-                            <div class="change-button">更改</div>
-                        </div>
+                </div>
+                <div class="mac-card" style="margin: 0 auto; max-width: 420px;">
+                    <h3 style="font-size: 16px; margin-bottom: 16px;">如何获取密码？</h3>
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                        <div style="min-width: 40px; background-color: rgba(71, 118, 230, 0.05); border-radius: 8px; display: flex; align-items: center; justify-content: center; height: 40px;"><i class="fas fa-info-circle"></i></div>
+                        <span style="font-size: 14px; color: var(--mac-text-secondary);">请向发送方获取由FileLink生成的6位密码</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="min-width: 40px; background-color: rgba(246, 173, 85, 0.05); color: var(--mac-warning); border-radius: 8px; display: flex; align-items: center; justify-content: center; height: 40px;"><i class="fas fa-lightbulb"></i></div>
+                        <span style="font-size: 14px; color: var(--mac-text-secondary);">发送方可通过复制或分享方式将密码发送给您</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const passwordCard = document.getElementById('passwordCard');
-            const lanCard = document.getElementById('lanCard');
-            const passwordInput = document.getElementById('passwordInput');
-            const passwordDigits = document.querySelectorAll('.password-digit');
-            const passwordContainer = document.getElementById('passwordContainer');
-            const passwordReceiveBtn = document.getElementById('passwordReceiveBtn');
-            const lanSearchBtn = document.getElementById('lanSearchBtn');
-            const locationSelector = document.getElementById('locationSelector');
-            
-            // 设置活跃的接收卡片
-            passwordCard.addEventListener('click', function() {
-                passwordCard.classList.add('active');
-                lanCard.classList.remove('active');
-            });
-            
-            lanCard.addEventListener('click', function() {
-                lanCard.classList.add('active');
-                passwordCard.classList.remove('active');
-            });
-            
-            // 密码输入处理
-            passwordContainer.addEventListener('click', function() {
-                passwordInput.focus();
-            });
-            
-            passwordInput.addEventListener('input', function(e) {
-                const value = e.target.value;
-                
-                // 更新密码数字显示
-                passwordDigits.forEach((digit, index) => {
-                    if (index < value.length) {
-                        digit.textContent = value[index];
-                        digit.classList.add('filled');
-                    } else {
-                        digit.textContent = '';
-                        digit.classList.remove('filled');
-                    }
-                });
-                
-                // 检查密码是否完成（6位数字）
-                if (value.length === 6) {
-                    passwordReceiveBtn.disabled = false;
-                } else {
-                    passwordReceiveBtn.disabled = true;
-                }
-            });
-            
-            // 键盘删除处理
-            passwordInput.addEventListener('keydown', function(e) {
-                if (e.key === 'Backspace') {
-                    const value = e.target.value;
-                    const lastIndex = value.length - 1;
-                    
-                    if (lastIndex >= 0) {
-                        passwordDigits[lastIndex].textContent = '';
-                        passwordDigits[lastIndex].classList.remove('filled');
-                    }
-                }
-            });
-            
-            // 密码接收按钮点击
-            passwordReceiveBtn.addEventListener('click', function() {
-                const password = passwordInput.value;
-                
-                if (password.length === 6) {
-                    // 在实际应用中，这里应该发送请求到服务器验证密码
-                    showToast(`正在连接，密码: ${password}`);
-                    // 模拟连接成功后跳转
-                    setTimeout(() => {
-                        window.location.href = 'transfer_progress.html';
-                    }, 1500);
-                }
-            });
-            
-            // 局域网搜索按钮点击
-            lanSearchBtn.addEventListener('click', function() {
-                showToast('正在搜索附近设备...');
-                // 模拟搜索后跳转
-                setTimeout(() => {
-                    window.location.href = 'discovery.html';
-                }, 800);
-            });
-            
-            // 保存位置选择
-            locationSelector.addEventListener('click', function() {
-                // 在实际应用中，这里应该打开系统文件选择器
-                showToast('打开文件夹选择器');
-            });
-            
-            // 显示提示信息的函数
-            function showToast(message) {
-                const toast = document.createElement('div');
-                toast.style.position = 'fixed';
-                toast.style.bottom = '30px';
-                toast.style.left = '50%';
-                toast.style.transform = 'translateX(-50%)';
-                toast.style.background = 'rgba(0, 0, 0, 0.8)';
-                toast.style.color = 'white';
-                toast.style.padding = '12px 24px';
-                toast.style.borderRadius = '6px';
-                toast.style.fontSize = '14px';
-                toast.style.fontWeight = '500';
-                toast.style.zIndex = '1000';
-                toast.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
-                toast.textContent = message;
-                
-                document.body.appendChild(toast);
-                
-                setTimeout(function() {
-                    toast.style.opacity = '0';
-                    toast.style.transition = 'opacity 0.5s ease';
-                    
-                    setTimeout(function() {
-                        toast.remove();
-                    }, 500);
-                }, 3000);
-            }
-        });
-    </script>
 </body>
 </html> 

@@ -3,734 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FileLink - 选择文件</title>
+    <title>发送文件 - FileLink</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/styles.css">
-    <style>
-        /* 文件选择页面样式 */
-        .file-selection-area {
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        
-        .page-subtitle {
-            font-size: 16px;
-            color: var(--text-secondary);
-            margin-bottom: 10px;
-        }
-        
-        .upload-container {
-            display: flex;
-            gap: 30px;
-        }
-        
-        .upload-section {
-            flex: 2;
-            min-height: 300px;
-            border: 2px dashed var(--border-color);
-            background-color: rgba(245, 247, 250, 0.7);
-            border-radius: var(--border-radius);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 40px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .upload-section:hover, .upload-section.dragover {
-            background-color: rgba(82, 113, 255, 0.05);
-            border-color: var(--primary-color);
-        }
-        
-        .upload-icon {
-            font-size: 60px;
-            color: var(--primary-color);
-            margin-bottom: 20px;
-            opacity: 0.7;
-        }
-        
-        .upload-title {
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 10px;
-            text-align: center;
-        }
-        
-        .upload-description {
-            font-size: 14px;
-            color: var(--text-secondary);
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        
-        .upload-buttons {
-            display: flex;
-            gap: 15px;
-        }
-        
-        .upload-btn {
-            padding: 10px 20px;
-            font-size: 14px;
-            font-weight: 500;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            transition: all 0.2s ease;
-        }
-        
-        .upload-btn i {
-            margin-right: 8px;
-        }
-        
-        .file-btn {
-            background-color: var(--primary-color);
-            color: white;
-        }
-        
-        .file-btn:hover {
-            background-color: #4560e0;
-        }
-        
-        .folder-btn {
-            background-color: white;
-            color: var(--text-primary);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-        
-        .folder-btn:hover {
-            background-color: #f5f5f5;
-        }
-        
-        .selected-files-section {
-            flex: 1;
-            background-color: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow-default);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            max-height: 500px;
-        }
-        
-        .selected-files-header {
-            padding: 15px;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        
-        .header-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-        }
-        
-        .file-count {
-            margin-left: 8px;
-            font-size: 12px;
-            font-weight: 600;
-            padding: 2px 8px;
-            border-radius: 10px;
-            background-color: var(--primary-light);
-            color: var(--primary-color);
-        }
-        
-        .clear-btn {
-            font-size: 13px;
-            color: var(--primary-color);
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 5px 10px;
-        }
-        
-        .clear-btn:hover {
-            text-decoration: underline;
-        }
-        
-        .selected-files-list {
-            flex: 1;
-            overflow-y: auto;
-            padding: 10px 0;
-        }
-        
-        .selected-file-item {
-            display: flex;
-            align-items: center;
-            padding: 10px 15px;
-            border-bottom: 1px solid var(--border-color);
-            transition: background-color 0.2s ease;
-        }
-        
-        .selected-file-item:last-child {
-            border-bottom: none;
-        }
-        
-        .selected-file-item:hover {
-            background-color: rgba(245, 247, 250, 0.8);
-        }
-        
-        .file-type-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
-            background-color: var(--primary-light);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 12px;
-            flex-shrink: 0;
-        }
-        
-        .file-type-icon i {
-            font-size: 18px;
-            color: var(--primary-color);
-        }
-        
-        .file-details {
-            flex: 1;
-            overflow: hidden;
-        }
-        
-        .file-name {
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--text-primary);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            margin-bottom: 3px;
-        }
-        
-        .file-meta {
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-        
-        .remove-file {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-tertiary);
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        
-        .remove-file:hover {
-            background-color: rgba(245, 101, 101, 0.1);
-            color: var(--error-color);
-        }
-        
-        .selected-files-footer {
-            padding: 15px;
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background-color: var(--light-bg);
-        }
-        
-        .total-size {
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-        
-        .empty-state {
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            color: var(--text-tertiary);
-            height: 100%;
-        }
-        
-        .empty-icon {
-            font-size: 60px;
-            margin-bottom: 15px;
-            opacity: 0.5;
-        }
-        
-        .empty-text {
-            font-size: 16px;
-            font-weight: 500;
-            margin-bottom: 5px;
-            color: var(--text-secondary);
-        }
-        
-        .empty-subtext {
-            font-size: 14px;
-            color: var(--text-tertiary);
-        }
-        
-        .next-step-section {
-            background-color: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow-default);
-            padding: 25px;
-            margin-top: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        
-        .next-step-info {
-            display: flex;
-            align-items: center;
-        }
-        
-        .step-number-circle {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background-color: var(--primary-light);
-            color: var(--primary-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            font-weight: 600;
-            margin-right: 15px;
-        }
-        
-        .step-details {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .step-label {
-            font-size: 14px;
-            color: var(--text-secondary);
-            margin-bottom: 3px;
-        }
-        
-        .step-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-        
-        .file-input {
-            display: none;
-        }
-        
-        /* 响应式样式 */
-        @media (max-width: 1024px) {
-            .upload-container {
-                flex-direction: column;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="css/macos.css">
 </head>
 <body>
-    <div class="desktop-container">
-        <!-- 侧边栏 -->
-        <div class="sidebar">
-            <div class="sidebar-header">
-                <div class="sidebar-logo">
-                    <i class="fas fa-link"></i>
-                    FileLink
-                </div>
+    <div class="mac-window">
+        <div class="mac-titlebar">
+            <div class="mac-window-controls">
+                <div class="mac-btn mac-btn-close"></div>
+                <div class="mac-btn mac-btn-minimize"></div>
+                <div class="mac-btn mac-btn-maximize"></div>
             </div>
-            <div class="sidebar-content">
-                <ul class="sidebar-menu">
-                    <li class="sidebar-menu-item">
-                        <a href="index.html" class="sidebar-menu-link">
-                            <i class="fas fa-home sidebar-menu-icon"></i>
-                            主页
-                        </a>
-                    </li>
-                    <li class="sidebar-menu-item">
-                        <a href="send_file.html" class="sidebar-menu-link active">
-                            <i class="fas fa-paper-plane sidebar-menu-icon"></i>
-                            发送文件
-                        </a>
-                    </li>
-                    <li class="sidebar-menu-item">
-                        <a href="receive_file.html" class="sidebar-menu-link">
-                            <i class="fas fa-download sidebar-menu-icon"></i>
-                            接收文件
-                        </a>
-                    </li>
-                    <li class="sidebar-menu-item">
-                        <a href="#" class="sidebar-menu-link">
-                            <i class="fas fa-history sidebar-menu-icon"></i>
-                            传输记录
-                        </a>
-                    </li>
-                    <li class="sidebar-menu-item">
-                        <a href="#" class="sidebar-menu-link">
-                            <i class="fas fa-cog sidebar-menu-icon"></i>
-                            设置
-                        </a>
-                    </li>
-                </ul>
-            </div>
-            <div class="sidebar-footer">
-                <div class="user-info">
-                    <div class="user-avatar">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <div style="margin-left: 10px;">
-                        <div class="user-name">我的电脑</div>
-                        <div class="user-device">FileLink 桌面端</div>
-                    </div>
-                </div>
+            <div class="mac-window-title">发送文件 - FileLink</div>
+        </div>
+        <div class="mac-toolbar">
+            <div class="mac-toolbar-section right">
+                <button class="mac-toolbar-button"><i class="fas fa-question-circle"></i></button>
             </div>
         </div>
-        
-        <!-- 主内容区域 -->
-        <div class="main-content">
-            <div class="topbar">
-                <div class="page-title">选择文件</div>
-                <div class="topbar-actions">
-                    <button class="topbar-btn" title="更多选项">
-                        <i class="fas fa-ellipsis-v"></i>
-                    </button>
+        <div class="mac-content">
+            <div class="mac-sidebar">
+                <div class="mac-sidebar-section">
+                    <div class="mac-sidebar-header">
+                        <span class="mac-sidebar-title">功能</span>
+                    </div>
+                    <ul class="mac-sidebar-items">
+                        <li class="mac-sidebar-item" onclick="location.href='index.html'"><i class="fas fa-home mac-sidebar-icon"></i><span class="mac-sidebar-label">主页</span></li>
+                        <li class="mac-sidebar-item active"><i class="fas fa-paper-plane mac-sidebar-icon"></i><span class="mac-sidebar-label">发送文件</span></li>
+                        <li class="mac-sidebar-item" onclick="location.href='receive_file.html'"><i class="fas fa-download mac-sidebar-icon"></i><span class="mac-sidebar-label">接收文件</span></li>
+                        <li class="mac-sidebar-item"><i class="fas fa-history mac-sidebar-icon"></i><span class="mac-sidebar-label">传输历史</span></li>
+                    </ul>
+                </div>
+                <div class="mac-sidebar-section">
+                    <div class="mac-sidebar-header">
+                        <span class="mac-sidebar-title">最近传输的设备</span>
+                    </div>
+                    <ul class="mac-sidebar-items">
+                        <li class="mac-sidebar-item"><i class="fas fa-mobile-alt mac-sidebar-icon"></i><span class="mac-sidebar-label">iPhone 13</span></li>
+                        <li class="mac-sidebar-item"><i class="fas fa-tablet-alt mac-sidebar-icon"></i><span class="mac-sidebar-label">iPad Pro</span></li>
+                    </ul>
+                </div>
+                <div class="sidebar-footer" style="margin-top:auto;">
+                    <button class="mac-toolbar-button" style="width:100%;justify-content:flex-start;"><i class="fas fa-cog"></i><span style="margin-left:8px;">设置</span></button>
                 </div>
             </div>
-            
-            <div class="content-area">
-                <div class="file-selection-area">
-                    <div>
-                        <h2>选择要发送的文件</h2>
-                        <p class="page-subtitle">请选择您要发送的文件或文件夹，支持拖放操作</p>
+            <div class="mac-main">
+                <h1 style="font-size: 24px; margin-bottom: 24px;">发送文件</h1>
+                <div class="mac-card" style="padding: 24px; margin-bottom: 24px;">
+                    <h2 style="font-size: 18px; font-weight: 500; margin-bottom: 20px;">选择要发送的文件</h2>
+                    <div id="drop-area" style="border: 2px dashed var(--mac-border-color); border-radius: var(--mac-border-radius-md); padding: 40px; text-align: center; margin-bottom: 20px; background-color: rgba(0, 0, 0, 0.02); cursor:pointer;">
+                        <i class="fas fa-cloud-upload-alt" style="font-size: 48px; color: var(--mac-text-tertiary); margin-bottom: 16px;"></i>
+                        <p style="font-size: 16px; font-weight: 500; margin-bottom: 8px;">拖放文件到这里或点击选择文件</p>
+                        <input type="file" id="file-input" multiple style="display: none;">
                     </div>
-                    
-                    <div class="upload-container">
-                        <!-- 上传区域 -->
-                        <div class="upload-section" id="dropZone">
-                            <div class="upload-icon">
-                                <i class="fas fa-cloud-upload-alt"></i>
+                    <div id="file-list" style="max-height: 300px; overflow-y: auto;"></div>
+                </div>
+                <div class="mac-card" style="padding: 24px;">
+                    <h2 style="font-size: 18px; font-weight: 500; margin-bottom: 20px;">传输选项</h2>
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 8px;">传输方式</label>
+                        <div style="display: flex; gap: 12px;">
+                            <div class="transfer-option" style="flex: 1; padding: 16px; border-radius: var(--mac-border-radius-md); border: 2px solid var(--mac-primary); background-color: rgba(0, 113, 227, 0.05); cursor: pointer;">
+                                <div style="display: flex; align-items: center; margin-bottom: 8px;"><i class="fas fa-wifi" style="font-size: 16px; color: var(--mac-primary); margin-right: 8px;"></i><span style="font-weight: 500;">局域网传输</span></div>
+                                <p style="font-size: 12px; color: var(--mac-text-secondary);">在同一网络下快速传输文件，无需互联网连接</p>
                             </div>
-                            <h3 class="upload-title">拖放文件到此处</h3>
-                            <p class="upload-description">或者点击下方按钮选择文件</p>
-                            <div class="upload-buttons">
-                                <button class="upload-btn file-btn" id="selectFileBtn">
-                                    <i class="fas fa-file"></i>
-                                    选择文件
-                                </button>
-                                <button class="upload-btn folder-btn" id="selectFolderBtn">
-                                    <i class="fas fa-folder"></i>
-                                    选择文件夹
-                                </button>
-                                <input type="file" id="fileInput" class="file-input" multiple>
-                                <input type="file" id="folderInput" class="file-input" webkitdirectory directory multiple>
-                            </div>
-                        </div>
-                        
-                        <!-- 已选文件列表 -->
-                        <div class="selected-files-section">
-                            <div class="selected-files-header">
-                                <div class="header-title">
-                                    已选择文件
-                                    <span class="file-count" id="fileCount">0</span>
-                                </div>
-                                <button class="clear-btn" id="clearBtn">清空所有</button>
-                            </div>
-                            
-                            <div class="selected-files-list" id="filesList">
-                                <!-- 文件列表将动态生成 -->
-                                <div class="empty-state" id="emptyState">
-                                    <div class="empty-icon">
-                                        <i class="far fa-file"></i>
-                                    </div>
-                                    <div class="empty-text">暂无选择文件</div>
-                                    <div class="empty-subtext">请选择要发送的文件或文件夹</div>
-                                </div>
-                            </div>
-                            
-                            <div class="selected-files-footer">
-                                <div class="total-size" id="totalSize">总大小: 0 B</div>
+                            <div class="transfer-option" style="flex: 1; padding: 16px; border-radius: var(--mac-border-radius-md); border: 1px solid var(--mac-border-color); cursor: pointer;">
+                                <div style="display: flex; align-items: center; margin-bottom: 8px;"><i class="fas fa-globe" style="font-size: 16px; color: var(--mac-text-secondary); margin-right: 8px;"></i><span style="font-weight: 500;">公网传输</span></div>
+                                <p style="font-size: 12px; color: var(--mac-text-secondary);">通过互联网传输，适合不同网络下的设备</p>
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- 下一步区域 -->
-                    <div class="next-step-section">
-                        <div class="next-step-info">
-                            <div class="step-number-circle">2</div>
-                            <div class="step-details">
-                                <div class="step-label">下一步</div>
-                                <div class="step-title">选择发送方式</div>
-                            </div>
-                        </div>
-                        <button class="btn btn-primary" id="nextBtn" disabled>
-                            <span style="margin-right: 8px;">继续</span>
-                            <i class="fas fa-arrow-right"></i>
-                        </button>
+                    <div style="margin-bottom: 20px;">
+                        <div style="display: flex; align-items: center; margin-bottom: 12px;"><input type="checkbox" id="encrypt-files" checked style="margin-right: 8px;"><label for="encrypt-files" style="font-size: 13px; font-weight: 500;">加密传输文件</label></div>
+                        <p style="font-size: 12px; color: var(--mac-text-secondary); margin-left: 20px;">使用端到端加密保护您的文件安全</p>
                     </div>
+                    <div style="margin-bottom: 24px;">
+                        <div style="display: flex; align-items: center; margin-bottom: 12px;"><input type="checkbox" id="compress-files" style="margin-right: 8px;"><label for="compress-files" style="font-size: 13px; font-weight: 500;">压缩文件后传输</label></div>
+                        <p style="font-size: 12px; color: var(--mac-text-secondary); margin-left: 20px;">压缩文件可以加快传输速度，但可能需要额外时间</p>
+                    </div>
+                    <div style="display: flex; justify-content: flex-end; gap: 12px;"><button class="mac-button mac-button-secondary">取消</button><button class="mac-button mac-button-primary" id="start-transfer-btn"><i class="fas fa-paper-plane mac-button-icon"></i>开始传输</button></div>
                 </div>
             </div>
         </div>
     </div>
-    
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const dropZone = document.getElementById('dropZone');
-            const fileInput = document.getElementById('fileInput');
-            const folderInput = document.getElementById('folderInput');
-            const selectFileBtn = document.getElementById('selectFileBtn');
-            const selectFolderBtn = document.getElementById('selectFolderBtn');
-            const filesList = document.getElementById('filesList');
-            const fileCount = document.getElementById('fileCount');
-            const totalSize = document.getElementById('totalSize');
-            const clearBtn = document.getElementById('clearBtn');
-            const nextBtn = document.getElementById('nextBtn');
-            const emptyState = document.getElementById('emptyState');
-            
-            let selectedFiles = []; // 存储选择的文件
-            let totalSizeBytes = 0; // 总文件大小（字节）
-            
-            // 选择文件按钮点击事件
-            selectFileBtn.addEventListener('click', function() {
-                fileInput.click();
-            });
-            
-            // 选择文件夹按钮点击事件
-            selectFolderBtn.addEventListener('click', function() {
-                folderInput.click();
-            });
-            
-            // 文件选择改变事件
-            fileInput.addEventListener('change', function(e) {
-                handleFiles(e.target.files);
-                this.value = null; // 重置input值，允许选择相同文件
-            });
-            
-            // 文件夹选择改变事件
-            folderInput.addEventListener('change', function(e) {
-                handleFiles(e.target.files);
-                this.value = null; // 重置input值
-            });
-            
-            // 清空按钮点击事件
-            clearBtn.addEventListener('click', function() {
-                clearFiles();
-            });
-            
-            // 下一步按钮点击事件
-            nextBtn.addEventListener('click', function() {
-                if (selectedFiles.length > 0) {
-                    // 这里可以将selectedFiles数据存储起来，然后跳转到下一页
-                    window.location.href = 'send_method.html';
-                }
-            });
-            
-            // 阻止拖拽默认行为
-            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-                dropZone.addEventListener(eventName, preventDefaults, false);
-                document.body.addEventListener(eventName, preventDefaults, false);
-            });
-            
-            // 拖拽效果
-            ['dragenter', 'dragover'].forEach(eventName => {
-                dropZone.addEventListener(eventName, highlight, false);
-            });
-            
-            ['dragleave', 'drop'].forEach(eventName => {
-                dropZone.addEventListener(eventName, unhighlight, false);
-            });
-            
-            // 处理拖放文件
-            dropZone.addEventListener('drop', function(e) {
-                const dt = e.dataTransfer;
-                const files = dt.files;
-                handleFiles(files);
-            });
-            
-            // 防止默认行为
-            function preventDefaults(e) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
-            
-            // 高亮拖拽区域
-            function highlight() {
-                dropZone.classList.add('dragover');
-            }
-            
-            // 取消高亮
-            function unhighlight() {
-                dropZone.classList.remove('dragover');
-            }
-            
-            // 处理文件
-            function handleFiles(files) {
-                if (!files || files.length === 0) return;
-                
-                // 将FileList对象转为数组
-                const filesArray = Array.from(files);
-                
-                // 将新文件添加到已选文件中
-                filesArray.forEach(file => {
-                    // 检查是否已经添加
-                    const isDuplicate = selectedFiles.some(f => 
-                        f.name === file.name && 
-                        f.size === file.size && 
-                        f.lastModified === file.lastModified
-                    );
-                    
-                    if (!isDuplicate) {
-                        selectedFiles.push(file);
-                        totalSizeBytes += file.size;
-                    }
-                });
-                
-                updateFilesList();
-            }
-            
-            // 更新文件列表
-            function updateFilesList() {
-                // 更新文件数量
-                fileCount.textContent = selectedFiles.length;
-                
-                // 更新总大小
-                totalSize.textContent = `总大小: ${formatFileSize(totalSizeBytes)}`;
-                
-                // 清空文件列表
-                filesList.innerHTML = '';
-                
-                // 判断是否显示空状态
-                if (selectedFiles.length === 0) {
-                    filesList.appendChild(emptyState);
-                    nextBtn.disabled = true;
-                    return;
-                } else {
-                    nextBtn.disabled = false;
-                }
-                
-                // 添加文件到列表
-                selectedFiles.forEach((file, index) => {
-                    const fileItem = document.createElement('div');
-                    fileItem.className = 'selected-file-item';
-                    
-                    const fileIcon = getFileIcon(file.name);
-                    
-                    fileItem.innerHTML = `
-                        <div class="file-type-icon" style="background-color: ${fileIcon.bg};">
-                            <i class="${fileIcon.icon}" style="color: ${fileIcon.color};"></i>
-                        </div>
-                        <div class="file-details">
-                            <div class="file-name">${file.name}</div>
-                            <div class="file-meta">${formatFileSize(file.size)} · ${formatDate(file.lastModified)}</div>
-                        </div>
-                        <div class="remove-file" data-index="${index}">
-                            <i class="fas fa-times"></i>
-                        </div>
-                    `;
-                    
-                    filesList.appendChild(fileItem);
-                });
-                
-                // 添加文件删除事件
-                document.querySelectorAll('.remove-file').forEach(item => {
-                    item.addEventListener('click', function() {
-                        const index = parseInt(this.getAttribute('data-index'));
-                        if (index >= 0 && index < selectedFiles.length) {
-                            totalSizeBytes -= selectedFiles[index].size;
-                            selectedFiles.splice(index, 1);
-                            updateFilesList();
-                        }
-                    });
-                });
-            }
-            
-            // 清空文件
-            function clearFiles() {
-                selectedFiles = [];
-                totalSizeBytes = 0;
-                updateFilesList();
-            }
-            
-            // 根据文件类型获取图标
-            function getFileIcon(filename) {
-                const extension = filename.split('.').pop().toLowerCase();
-                let icon = 'fas fa-file';
-                let color = '#A5ADBA';
-                let bg = 'rgba(165, 173, 186, 0.1)';
-                
-                // 根据文件类型设置图标
-                if (/^(jpg|jpeg|png|gif|bmp|webp)$/.test(extension)) {
-                    icon = 'fas fa-file-image';
-                    color = '#00C19A';
-                    bg = 'rgba(0, 193, 154, 0.1)';
-                } else if (/^(mp4|avi|mov|wmv|flv|mkv)$/.test(extension)) {
-                    icon = 'fas fa-file-video';
-                    color = '#FFAB00';
-                    bg = 'rgba(255, 171, 0, 0.1)';
-                } else if (/^(mp3|wav|ogg|flac|aac)$/.test(extension)) {
-                    icon = 'fas fa-file-audio';
-                    color = '#FF5B5B';
-                    bg = 'rgba(255, 91, 91, 0.1)';
-                } else if (extension === 'pdf') {
-                    icon = 'fas fa-file-pdf';
-                    color = '#FF5B5B';
-                    bg = 'rgba(255, 91, 91, 0.1)';
-                } else if (/^(doc|docx)$/.test(extension)) {
-                    icon = 'fas fa-file-word';
-                    color = '#5271FF';
-                    bg = 'rgba(82, 113, 255, 0.1)';
-                } else if (/^(xls|xlsx)$/.test(extension)) {
-                    icon = 'fas fa-file-excel';
-                    color = '#00C19A';
-                    bg = 'rgba(0, 193, 154, 0.1)';
-                } else if (/^(ppt|pptx)$/.test(extension)) {
-                    icon = 'fas fa-file-powerpoint';
-                    color = '#FF5B5B';
-                    bg = 'rgba(255, 91, 91, 0.1)';
-                } else if (/^(zip|rar|7z|tar|gz)$/.test(extension)) {
-                    icon = 'fas fa-file-archive';
-                    color = '#7353E5';
-                    bg = 'rgba(115, 83, 229, 0.1)';
-                } else if (/^(html|css|js|json|xml)$/.test(extension)) {
-                    icon = 'fas fa-file-code';
-                    color = '#5271FF';
-                    bg = 'rgba(82, 113, 255, 0.1)';
-                } else if (!extension && filename.indexOf('/') > -1) {
-                    // 可能是文件夹路径
-                    icon = 'fas fa-folder';
-                    color = '#FFAB00';
-                    bg = 'rgba(255, 171, 0, 0.1)';
-                }
-                
-                return { icon, color, bg };
-            }
-            
-            // 格式化文件大小
-            function formatFileSize(bytes) {
-                if (bytes === 0) return '0 B';
-                
-                const k = 1024;
-                const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
-                const i = Math.floor(Math.log(bytes) / Math.log(k));
-                
-                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-            }
-            
-            // 格式化日期
-            function formatDate(timestamp) {
-                const date = new Date(timestamp);
-                return date.toLocaleDateString();
-            }
-            
-            // 初始化
-            updateFilesList();
-        });
-    </script>
 </body>
 </html> 

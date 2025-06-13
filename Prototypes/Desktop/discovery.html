@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FileLink桌面端 - 发现设备</title>
+    <title>传输历史 - FileLink</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/macos.css">
     <style>
         /* 全局颜色变量 */
         :root {
@@ -587,96 +588,116 @@
     </style>
 </head>
 <body>
-    <div class="simplified-container">
-        <!-- 主内容区域 -->
-        <div class="main-content">
-            <div class="topbar">
-                <!-- macOS 风格窗口控制按钮 -->
-                <div class="window-controls">
-                    <div class="window-control control-close"></div>
-                    <div class="window-control control-minimize"></div>
-                    <div class="window-control control-expand"></div>
+    <div class="mac-window">
+        <div class="mac-titlebar">
+            <div class="mac-window-controls">
+                <div class="mac-btn mac-btn-close"></div>
+                <div class="mac-btn mac-btn-minimize"></div>
+                <div class="mac-btn mac-btn-maximize"></div>
+            </div>
+            <div class="mac-window-title">传输历史</div>
+        </div>
+        <div class="mac-toolbar">
+            <div class="mac-toolbar-section right">
+                <div class="mac-search">
+                    <i class="fas fa-search mac-search-icon"></i>
+                    <input type="text" class="mac-search-input" placeholder="搜索文件/设备...">
                 </div>
-                
-                <div class="page-title">FileLink - 发现</div>
-                <div class="user-info-bar">
-                    <div class="user-avatar">
-                        <i class="fas fa-user"></i>
+                <button class="mac-toolbar-button"><i class="fas fa-question-circle"></i></button>
+            </div>
+        </div>
+        <div class="mac-content">
+            <div class="mac-sidebar">
+                <div class="mac-sidebar-section">
+                    <div class="mac-sidebar-header">
+                        <span class="mac-sidebar-title">功能</span>
                     </div>
-                    <div style="margin-left: 10px;">
-                        <div class="user-name">我的电脑</div>
-                        <div class="user-device">MacBook Pro</div>
-                    </div>
+                    <ul class="mac-sidebar-items">
+                        <li class="mac-sidebar-item" onclick="location.href='index.html'"><i class="fas fa-home mac-sidebar-icon"></i><span class="mac-sidebar-label">主页</span></li>
+                        <li class="mac-sidebar-item" onclick="location.href='send_file.html'"><i class="fas fa-paper-plane mac-sidebar-icon"></i><span class="mac-sidebar-label">发送文件</span></li>
+                        <li class="mac-sidebar-item" onclick="location.href='receive_file.html'"><i class="fas fa-download mac-sidebar-icon"></i><span class="mac-sidebar-label">接收文件</span></li>
+                        <li class="mac-sidebar-item active"><i class="fas fa-history mac-sidebar-icon"></i><span class="mac-sidebar-label">传输历史</span></li>
+                    </ul>
                 </div>
-                <div class="topbar-actions">
-                    <button class="topbar-btn receive-btn" id="receiveFileBtn" title="接收文件">
-                        <i class="fas fa-download"></i>
-                    </button>
-                    <button class="topbar-btn" id="refreshDevicesBtn" title="刷新设备列表">
-                        <i class="fas fa-sync-alt"></i>
-                    </button>
-                    <button class="topbar-btn" id="settingsBtn" title="设置">
-                        <i class="fas fa-cog"></i>
-                    </button>
-                    <button class="topbar-btn" id="helpBtn" title="帮助">
-                        <i class="fas fa-question"></i>
-                    </button>
+                <div class="mac-sidebar-section">
+                    <div class="mac-sidebar-header">
+                        <span class="mac-sidebar-title">最近传输的设备</span>
+                    </div>
+                    <ul class="mac-sidebar-items">
+                        <li class="mac-sidebar-item"><i class="fas fa-mobile-alt mac-sidebar-icon"></i><span class="mac-sidebar-label">iPhone 13</span></li>
+                        <li class="mac-sidebar-item"><i class="fas fa-tablet-alt mac-sidebar-icon"></i><span class="mac-sidebar-label">iPad Pro</span></li>
+                    </ul>
+                </div>
+                <div class="sidebar-footer" style="margin-top:auto;">
+                    <button class="mac-toolbar-button" style="width:100%;justify-content:flex-start;"><i class="fas fa-cog"></i><span style="margin-left:8px;">设置</span></button>
                 </div>
             </div>
-            
-            <div class="content-area">
-                <!-- 雷达区域 -->
-                <div class="radar-container">
-                    <!-- 雷达圆环 -->
-                    <div class="radar-circle radar-circle-1"></div>
-                    <div class="radar-circle radar-circle-2"></div>
-                    <div class="radar-circle radar-circle-3"></div>
-                    
-                    <!-- 雷达十字线 -->
-                    <div class="radar-line radar-line-h"></div>
-                    <div class="radar-line radar-line-v"></div>
-                    
-                    <!-- 雷达动画效果 -->
-                    <div class="radar-center"></div>
-                    <div class="radar-scanner"></div>
-                    <div class="radar-pulse"></div>
-                    <div class="ripple"></div>
-                    
-                    <!-- 设备图标 - iPhone -->
-                    <div class="radar-device" data-device-id="1" data-device-name="iPhone 15 Pro" style="top: 25%; left: 65%;">
-                        <i class="fas fa-mobile-alt radar-device-icon"></i>
-                        <div class="device-name-label">iPhone 15 Pro</div>
+            <div class="mac-main">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
+                    <div style="display: flex; gap: 12px;">
+                        <button class="mac-button mac-button-secondary active">全部</button>
+                        <button class="mac-button mac-button-secondary">发送</button>
+                        <button class="mac-button mac-button-secondary">接收</button>
                     </div>
-                    
-                    <!-- 设备图标 - iPad -->
-                    <div class="radar-device" data-device-id="2" data-device-name="iPad Air" style="top: 70%; left: 35%;">
-                        <i class="fas fa-tablet-alt radar-device-icon"></i>
-                        <div class="device-name-label">iPad Air</div>
-                    </div>
-                    
-                    <!-- 设备图标 - MacBook -->
-                    <div class="radar-device" data-device-id="3" data-device-name="MacBook Air" style="top: 40%; left: 30%;">
-                        <i class="fas fa-laptop radar-device-icon"></i>
-                        <div class="device-name-label">MacBook Air</div>
+                    <div class="mac-search" style="width: 260px;">
+                        <i class="fas fa-search mac-search-icon"></i>
+                        <input type="text" class="mac-search-input" placeholder="搜索文件/设备...">
                     </div>
                 </div>
-            </div>
-            
-            <!-- 底部操作栏 -->
-            <div class="actions-bar">
-                <div class="selected-device-info" id="selectedDeviceInfo" style="display: none; color: var(--primary-color); font-weight: 500;">
-                    <i class="fas fa-check-circle" style="margin-right: 6px;"></i>
-                    已选择设备：<span class="selected-device-name" id="selectedDeviceName"></span>
-                </div>
-                <div class="selected-device-info" id="noDeviceSelectedInfo">
-                    <i class="fas fa-globe" style="margin-right: 6px; color: var(--primary-color);"></i>
-                    未选择设备将使用公网连接模式
-                </div>
-                <div class="actions-buttons">
-                    <button class="btn btn-primary" id="sendFileBtn">
-                        <i class="fas fa-paper-plane btn-icon"></i>
-                        发送文件
-                    </button>
+                <div class="mac-card" style="padding: 0;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid var(--mac-border-color); text-align: left;">
+                                <th style="padding: 12px 16px; font-weight: 500; color: var(--mac-text-secondary); font-size: 12px;">文件名</th>
+                                <th style="padding: 12px 16px; font-weight: 500; color: var(--mac-text-secondary); font-size: 12px;">类型</th>
+                                <th style="padding: 12px 16px; font-weight: 500; color: var(--mac-text-secondary); font-size: 12px;">设备</th>
+                                <th style="padding: 12px 16px; font-weight: 500; color: var(--mac-text-secondary); font-size: 12px;">时间</th>
+                                <th style="padding: 12px 16px; font-weight: 500; color: var(--mac-text-secondary); font-size: 12px;">状态</th>
+                                <th style="padding: 12px 16px; font-weight: 500; color: var(--mac-text-secondary); font-size: 12px;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid var(--mac-border-color);">
+                                <td style="padding: 12px 16px;">
+                                    <div style="display: flex; align-items: center;">
+                                        <i class="fas fa-file-pdf" style="color: #FF5733; margin-right: 8px;"></i>
+                                        项目报告.pdf
+                                    </div>
+                                </td>
+                                <td style="padding: 12px 16px; color: var(--mac-text-secondary);">发送</td>
+                                <td style="padding: 12px 16px; color: var(--mac-text-secondary);">iPhone 13</td>
+                                <td style="padding: 12px 16px; color: var(--mac-text-secondary);">今天 14:30</td>
+                                <td style="padding: 12px 16px;"><span class="mac-badge mac-badge-success">已完成</span></td>
+                                <td style="padding: 12px 16px;"><button class="mac-button mac-button-secondary" style="padding: 4px 10px; font-size: 12px;"><i class="fas fa-folder-open mac-button-icon"></i>打开</button><button class="mac-button mac-button-secondary" style="padding: 4px 10px; font-size: 12px; margin-left: 8px;"><i class="fas fa-trash-alt mac-button-icon"></i>删除</button></td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--mac-border-color);">
+                                <td style="padding: 12px 16px;">
+                                    <div style="display: flex; align-items: center;">
+                                        <i class="fas fa-file-image" style="color: #33A8FF; margin-right: 8px;"></i>
+                                        设计稿.png
+                                    </div>
+                                </td>
+                                <td style="padding: 12px 16px; color: var(--mac-text-secondary);">接收</td>
+                                <td style="padding: 12px 16px; color: var(--mac-text-secondary);">iPad Pro</td>
+                                <td style="padding: 12px 16px; color: var(--mac-text-secondary);">今天 11:15</td>
+                                <td style="padding: 12px 16px;"><span class="mac-badge mac-badge-success">已完成</span></td>
+                                <td style="padding: 12px 16px;"><button class="mac-button mac-button-secondary" style="padding: 4px 10px; font-size: 12px;"><i class="fas fa-folder-open mac-button-icon"></i>打开</button><button class="mac-button mac-button-secondary" style="padding: 4px 10px; font-size: 12px; margin-left: 8px;"><i class="fas fa-trash-alt mac-button-icon"></i>删除</button></td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 12px 16px;">
+                                    <div style="display: flex; align-items: center;">
+                                        <i class="fas fa-file-word" style="color: #2B579A; margin-right: 8px;"></i>
+                                        会议记录.docx
+                                    </div>
+                                </td>
+                                <td style="padding: 12px 16px; color: var(--mac-text-secondary);">发送</td>
+                                <td style="padding: 12px 16px; color: var(--mac-text-secondary);">MacBook Pro</td>
+                                <td style="padding: 12px 16px; color: var(--mac-text-secondary);">昨天 16:45</td>
+                                <td style="padding: 12px 16px;"><span class="mac-badge mac-badge-success">已完成</span></td>
+                                <td style="padding: 12px 16px;"><button class="mac-button mac-button-secondary" style="padding: 4px 10px; font-size: 12px;"><i class="fas fa-folder-open mac-button-icon"></i>打开</button><button class="mac-button mac-button-secondary" style="padding: 4px 10px; font-size: 12px; margin-left: 8px;"><i class="fas fa-trash-alt mac-button-icon"></i>删除</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

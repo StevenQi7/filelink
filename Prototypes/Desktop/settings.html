@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>设置 - FileLink</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/macos.css">
+</head>
+<body>
+    <div class="mac-window">
+        <div class="mac-titlebar">
+            <div class="mac-window-controls">
+                <div class="mac-btn mac-btn-close"></div>
+                <div class="mac-btn mac-btn-minimize"></div>
+                <div class="mac-btn mac-btn-maximize"></div>
+            </div>
+            <div class="mac-window-title">设置</div>
+        </div>
+        <div class="mac-toolbar">
+            <div class="mac-toolbar-section right">
+                <button class="mac-toolbar-button"><i class="fas fa-question-circle"></i></button>
+            </div>
+        </div>
+        <div class="mac-content">
+            <div class="mac-sidebar">
+                <div class="mac-sidebar-section">
+                    <div class="mac-sidebar-header">
+                        <span class="mac-sidebar-title">功能</span>
+                    </div>
+                    <ul class="mac-sidebar-items">
+                        <li class="mac-sidebar-item" onclick="location.href='index.html'"><i class="fas fa-home mac-sidebar-icon"></i><span class="mac-sidebar-label">主页</span></li>
+                        <li class="mac-sidebar-item" onclick="location.href='send_file.html'"><i class="fas fa-paper-plane mac-sidebar-icon"></i><span class="mac-sidebar-label">发送文件</span></li>
+                        <li class="mac-sidebar-item" onclick="location.href='receive_file.html'"><i class="fas fa-download mac-sidebar-icon"></i><span class="mac-sidebar-label">接收文件</span></li>
+                        <li class="mac-sidebar-item" onclick="location.href='history.html'"><i class="fas fa-history mac-sidebar-icon"></i><span class="mac-sidebar-label">传输记录</span></li>
+                        <li class="mac-sidebar-item active"><i class="fas fa-cog mac-sidebar-icon"></i><span class="mac-sidebar-label">设置</span></li>
+                    </ul>
+                </div>
+                <div class="mac-sidebar-section">
+                    <div class="mac-sidebar-header">
+                        <span class="mac-sidebar-title">最近传输的设备</span>
+                    </div>
+                    <ul class="mac-sidebar-items">
+                        <li class="mac-sidebar-item"><i class="fas fa-mobile-alt mac-sidebar-icon"></i><span class="mac-sidebar-label">iPhone 13</span></li>
+                        <li class="mac-sidebar-item"><i class="fas fa-tablet-alt mac-sidebar-icon"></i><span class="mac-sidebar-label">iPad Pro</span></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mac-main" style="max-width: 700px; margin: 0 auto;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px;">
+                    <h1 style="font-size: 24px; font-weight: 700;">设置</h1>
+                    <button class="mac-button mac-button-secondary"><i class="fas fa-download mac-button-icon"></i>导出设置</button>
+                </div>
+                <div class="mac-card" style="padding: 32px 24px; margin-bottom: 32px;">
+                    <h2 style="font-size: 18px; font-weight: 600; margin-bottom: 24px;">常规设置</h2>
+                    <div class="settings-item" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
+                        <div style="display: flex; align-items: center;">
+                            <div class="setting-icon" style="background: #e6f2ff; color: #5271ff;"><i class="fas fa-tablet-alt"></i></div>
+                            <div style="margin-left: 16px;">
+                                <div class="setting-label">设备名称</div>
+                                <div class="setting-description">自定义您的设备在网络中显示的名称</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div class="setting-value">MacBook Pro</div>
+                            <i class="fas fa-chevron-right" style="color: #A5ADBA;"></i>
+                        </div>
+                    </div>
+                    <div class="settings-item" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
+                        <div style="display: flex; align-items: center;">
+                            <div class="setting-icon" style="background: #ede7f6; color: #5e5ce6;"><i class="fas fa-moon"></i></div>
+                            <div style="margin-left: 16px;">
+                                <div class="setting-label">深色模式</div>
+                                <div class="setting-description">切换界面的亮色和暗色主题</div>
+                            </div>
+                        </div>
+                        <div class="setting-toggle" id="darkModeToggle">
+                            <div class="toggle-knob"></div>
+                        </div>
+                    </div>
+                    <div class="settings-item" style="display: flex; align-items: center; justify-content: space-between;">
+                        <div style="display: flex; align-items: center;">
+                            <div class="setting-icon" style="background: #fff3e0; color: #ff9800;"><i class="fas fa-globe"></i></div>
+                            <div style="margin-left: 16px;">
+                                <div class="setting-label">语言</div>
+                                <div class="setting-description">选择应用界面显示语言</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div class="setting-value">跟随系统</div>
+                            <i class="fas fa-chevron-right" style="color: #A5ADBA;"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="mac-card" style="padding: 32px 24px;">
+                    <h2 style="font-size: 18px; font-weight: 600; margin-bottom: 24px;">安全设置</h2>
+                    <div class="settings-item" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
+                        <div style="display: flex; align-items: center;">
+                            <div class="setting-icon" style="background: #e0f7fa; color: #00bcd4;"><i class="fas fa-download"></i></div>
+                            <div style="margin-left: 16px;">
+                                <div class="setting-label">信任设备自动接收</div>
+                                <div class="setting-description">允许来自信任设备的文件自动下载</div>
+                            </div>
+                        </div>
+                        <div class="setting-toggle" id="autoAcceptToggle">
+                            <div class="toggle-knob"></div>
+                        </div>
+                    </div>
+                    <div class="settings-item" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
+                        <div style="display: flex; align-items: center;">
+                            <div class="setting-icon" style="background: #e0f2f1; color: #009688;"><i class="fas fa-shield-alt"></i></div>
+                            <div style="margin-left: 16px;">
+                                <div class="setting-label">管理信任设备</div>
+                                <div class="setting-description">查看和管理已授权的设备列表</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div class="setting-value">0个设备</div>
+                            <i class="fas fa-chevron-right" style="color: #A5ADBA;"></i>
+                        </div>
+                    </div>
+                    <div class="settings-item" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
+                        <div style="display: flex; align-items: center;">
+                            <div class="setting-icon" style="background: #e8eaf6; color: #3f51b5;"><i class="fas fa-lock"></i></div>
+                            <div style="margin-left: 16px;">
+                                <div class="setting-label">端到端加密</div>
+                                <div class="setting-description">启用文件传输过程中的加密保护</div>
+                            </div>
+                        </div>
+                        <div class="setting-toggle active" id="encryptionToggle">
+                            <div class="toggle-knob"></div>
+                        </div>
+                    </div>
+                    <div class="settings-item" style="display: flex; align-items: center; justify-content: space-between;">
+                        <div style="display: flex; align-items: center;">
+                            <div class="setting-icon" style="background: #ececec; color: #757575;"><i class="fas fa-eye-slash"></i></div>
+                            <div style="margin-left: 16px;">
+                                <div class="setting-label">隐私模式</div>
+                                <div class="setting-description">隐藏设备名称和传输历史记录</div>
+                            </div>
+                        </div>
+                        <div class="setting-toggle" id="privacyModeToggle">
+                            <div class="toggle-knob"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 
